@@ -133,6 +133,8 @@ def reset_buttons():
     for button in button_list:
         button.reset_click()
 
+'''main menu methods'''
+
 
 def display_menu():
     """Functions to display the main menu and activate relevant buttons"""
@@ -158,82 +160,72 @@ def draw_menu_text():
     GRID_DISPLAY.blit(more_players, center_text)
 
 
+'''end main menu methods'''
+'''help menu methods'''
+
+
 def display_help():
     """Draws text on the help menu, including controls for all potential players"""
 
     # All text for player 1
-    p1_font = HELP_FONT.render("Player 1 Controls:", 1, WHITE)
-    p1_left = HELP_FONT.render("Left: Left Arrow Key", 1, WHITE)
-    p1_right = HELP_FONT.render("Right: Right Arrow Key", 1, WHITE)
-    p1_up = HELP_FONT.render("Up: Up Arrow Key", 1, WHITE)
-    p1_down = HELP_FONT.render("Down: Down Arrow Key", 1, WHITE)
-
-    center_text = p1_font.get_rect()
-    center_text.centerx = SCREEN_WIDTH * .15
-    center_text.centery = SCREEN_HEIGHT * .1
-    GRID_DISPLAY.blit(p1_font, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .15)
-    GRID_DISPLAY.blit(p1_left, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(p1_right, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(p1_up, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(p1_down, center_text)
+    player_1_controls = ["Left Arrow Key", "Right Arrow Key", "Up Arrow Key",
+                         "Down Arrow Key"]
+    create_help_text("Player 1", player_1_controls, SCREEN_WIDTH * .15,
+                     SCREEN_HEIGHT * .1)
 
     # All text for player 2
-    p2_font = HELP_FONT.render("Player 2 Controls:", 1, WHITE)
-    p2_left = HELP_FONT.render("Left: A", 1, WHITE)
-    p2_right = HELP_FONT.render("Right: D", 1, WHITE)
-    p2_up = HELP_FONT.render("Up: W", 1, WHITE)
-    p2_down = HELP_FONT.render("Down: S", 1, WHITE)
-
-    center_text = p2_font.get_rect()
-    center_text.centerx = SCREEN_WIDTH * .5
-    center_text.centery = SCREEN_HEIGHT * .1
-    GRID_DISPLAY.blit(p2_font, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .15)
-    GRID_DISPLAY.blit(p2_left, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(p2_right, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(p2_up, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(p2_down, center_text)
+    player_2_controls = ["A", "D", "W", "S"]
+    create_help_text("Player 2", player_2_controls, SCREEN_WIDTH * .5,
+                     SCREEN_HEIGHT * .1)
 
     # draws dividing line between the first and second set of instructions
-    pygame.draw.line(GRID_DISPLAY, WHITE, (center_text.left - 15, SCREEN_HEIGHT * .08),
-                     (center_text.left - 15, SCREEN_HEIGHT * .6))
+    pygame.draw.line(GRID_DISPLAY, WHITE, (SCREEN_WIDTH*.35, SCREEN_HEIGHT * .08),
+                     (SCREEN_WIDTH*.35, SCREEN_HEIGHT * .6))
 
     # All text for player 3
-    p3_font = HELP_FONT.render("Player 3 Controls:", 1, WHITE)
-    p3_left = HELP_FONT.render("Left: J", 1, WHITE)
-    p3_right = HELP_FONT.render("Right: L", 1, WHITE)
-    p3_up = HELP_FONT.render("Up: I", 1, WHITE)
-    p3_down = HELP_FONT.render("Down: K", 1, WHITE)
-
-    center_text = p3_font.get_rect()
-    center_text.centerx = SCREEN_WIDTH * .85
-    center_text.centery = SCREEN_HEIGHT * .1
-    GRID_DISPLAY.blit(p3_font, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .15)
-    GRID_DISPLAY.blit(p3_left, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(p3_right, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(p3_up, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(p3_down, center_text)
+    player_3_controls = ["J", "L", "I", "K"]
+    create_help_text("Player 3", player_3_controls, SCREEN_WIDTH * .85,
+                     SCREEN_HEIGHT * .1)
 
     # draws divide line between the 2nd and 3rd set of instructions
-    pygame.draw.line(GRID_DISPLAY, WHITE, (center_text.left - 15, SCREEN_HEIGHT * .08),
-                     (center_text.left - 15, SCREEN_HEIGHT * .6))
+    pygame.draw.line(GRID_DISPLAY, WHITE, (SCREEN_WIDTH*.66, SCREEN_HEIGHT * .08),
+                     (SCREEN_WIDTH*.66, SCREEN_HEIGHT * .6))
 
     # makes the back button visible
     for button in button_list:
         if button.info == "Back":
             button.draw_button(GRID_DISPLAY)
             button.set_click()
+
+
+def create_help_text(player_name, control_list, start_x, start_y):
+    """consolidated help texts to reuse one method, requires following parameters:
+        :param player_name: string, the name to put before "controls"
+        :param control_list: list of strings, list of 4 buttons, representing left, right, up, down
+        :param start_x: int, the start x value of the CENTER of the rectangle
+        :param start_y: int, the start y value of the CENTER of the rectangle"""
+    # Fonts rendered initially
+    text_font = HELP_FONT.render(player_name + " Controls:", 1, WHITE)
+    text_left = HELP_FONT.render("Left: " + control_list[0], 1, WHITE)
+    text_right = HELP_FONT.render("Right: " + control_list[1], 1, WHITE)
+    text_up = HELP_FONT.render("Up: " + control_list[2], 1, WHITE)
+    text_down = HELP_FONT.render("Down: " + control_list[3], 1, WHITE)
+
+    center_text = text_font.get_rect()
+    center_text.centerx = start_x
+    center_text.centery = start_y
+    GRID_DISPLAY.blit(text_font, center_text)
+    center_text.centery += (SCREEN_HEIGHT * .15)
+    GRID_DISPLAY.blit(text_left, center_text)
+    center_text.centery += (SCREEN_HEIGHT * .1)
+    GRID_DISPLAY.blit(text_right, center_text)
+    center_text.centery += (SCREEN_HEIGHT * .1)
+    GRID_DISPLAY.blit(text_up, center_text)
+    center_text.centery += (SCREEN_HEIGHT * .1)
+    GRID_DISPLAY.blit(text_down, center_text)
+
+'''end help menu methods'''
+'''buttons buttons buttons'''
 
 
 def create_buttons():
@@ -297,5 +289,6 @@ def create_buttons():
     return all_button
 
 
+'''end buttons buttons buttons'''
 '''You've reached the end of the file?'''
 main()
