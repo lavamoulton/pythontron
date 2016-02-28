@@ -43,7 +43,9 @@ def main():
         elif game_status == "Playing":
             pass
         elif game_status == "Paused":
-            pass
+            pause_game(grid_display, button_list, Color("White"), screen_width, screen_height, game_status)
+        elif game_status == "Dead":
+            pause_game(grid_display, button_list, Color("Red"), screen_width, screen_height, "Game Over")
 
         # the user can do things too, right? let's check those events
         for game_event in pygame.event.get():
@@ -74,7 +76,8 @@ def main():
                         elif button.info == "Continue":
                             game_status = "Playing"
                         elif button.info == "Reset":
-                            pass
+                            # TODO: Add methods to reset the state of the game
+                            game_status = "Playing"
 
             elif game_event.type == KEYDOWN and game_status == "Playing":
                 if game_event.key == K_UP:
@@ -89,8 +92,9 @@ def main():
                 elif game_event.key == K_RIGHT:
                     # Player1.setDirection('right')
                     pass
+                # pause the game with the "space" button
                 elif game_event.key == K_SPACE:
-                    game_status = "Paused"
+                    game_status = "Dead"
 
         # draw current state of screen
         pygame.display.update()
@@ -253,6 +257,36 @@ def create_help_text(player_name, control_list, start_x, start_y, grid_display, 
     grid_display.blit(text_down, center_text)
 
 '''end help menu methods'''
+'''pause menu methods'''
+
+
+def pause_game(grid_display, button_list, text_color, screen_width, screen_height, text):
+    """creates the pause menu and all text, as well as activating the continue and reset button
+        :param grid_display: the game display passed in as an arg
+        :param button_list: list of all buttons present in the game
+        :param text_color: color of the text to be created
+        :param screen_width: the width of the screen
+        :param screen_height: the height of the screen
+        :param text: text to display at the top, either 'Game Over' or 'Paused'
+            this will also affect button display"""
+
+    # create a font for use in the menu
+    pause_font = pygame.font.SysFont("monospace", 50)
+
+    # display text
+    pause_text = pause_font.render(text, 1, text_color)
+    center_text = pause_text.get_rect()
+    center_text.centerx = screen_width * .5
+    center_text.centery = screen_height * .25
+    grid_display.blit(pause_text, center_text)
+
+    # will not draw continue button if the game has already ended
+    for button in button_list:
+        if (button.info == "Continue" and text != "Game Over") or button.info == "Reset":
+            button.draw_button(grid_display)
+            button.set_click()
+
+'''end pause menu methods'''
 '''buttons buttons buttons'''
 
 
