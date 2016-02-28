@@ -1,7 +1,7 @@
 # necessary imports
 from button import *
 from pygame import *
-import sys
+import sys, os
 
 
 def main():
@@ -25,6 +25,7 @@ def main():
     game_grid = gen_grid(grid_width, grid_height)  # initializes 2D array representing the grid
     button_list = create_buttons(grid_display, Color("Gray"), Color("Blue"),
                                  screen_width, screen_height)  # creates all necessary buttons
+    cycle_img, cycle_rect = begin_anim("assets", "lightcycle.png", screen_width, screen_height)
 
     # misc
     pygame.display.set_caption("PyTron!")
@@ -37,7 +38,8 @@ def main():
 
         # what state are we in?
         if game_status == "Menu":
-            display_menu(grid_display, button_list, Color("White"), screen_width, screen_height)
+            display_menu(grid_display, button_list, Color("White"), screen_width, screen_height, cycle_img,
+                        cycle_rect)
         elif game_status == "Help":
             display_help(grid_display, button_list, Color("White"), screen_width, screen_height)
         elif game_status == "Playing":
@@ -122,15 +124,20 @@ def gen_grid(grid_width, grid_height):
 '''main menu methods'''
 
 
-def display_menu(grid_display, button_list, text_color, screen_width, screen_height):
+def display_menu(grid_display, button_list, text_color, screen_width, screen_height, cycle_img, cycle_rect):
     """Functions to display the main menu and activate relevant buttons
         :param grid_display: the game display passed in as an arg
         :param button_list: list of all buttons present in the game
         :param text_color: color of the text created
         :param screen_width: the width of the screen
-        :param screen_height: the height of the screen"""
+        :param screen_height: the height of the screen
+        :param cycle_img: cycle image used in menu animation
+        :param cycle_rect: rectangle containing the cycle used in menu animation"""
 
     draw_menu_text(grid_display, text_color, screen_width, screen_height)
+
+    animate_menu(grid_display, screen_width, screen_height, cycle_img, cycle_rect, screen_width*.33,
+                 screen_width*.66, 2)
 
     for button in button_list:
         if button.info != "Back" and button.info != "Continue" and button.info != "Reset":
@@ -160,8 +167,101 @@ def draw_menu_text(grid_display, text_color, screen_width, screen_height):
     grid_display.blit(more_players, center_text)
 
 
-def animate_menu():
-    """creates an animation above the text in the main menu"""
+def begin_anim(folder_name, file_name, screen_width, screen_height):
+    """creates the cycle image then converts it to a surface for use later in main menu animation
+        :param folder_name: name of the folder to pull the image from
+        :param file_name: name of the image file
+        :param screen_width: width of the screen
+        :param screen_height: height of the screen"""
+
+    # get the image and rect of the lightcycle
+    cycle_img, cycle_rect = get_image(folder_name, file_name)
+    cycle_rect.top = screen_height * .1
+    cycle_rect.left = screen_width * .33
+
+    return cycle_img, cycle_rect
+
+
+def animate_menu(grid_display, screen_width, screen_height, cycle_img, cycle_rect, start_x,
+                 end_x, step):
+    """animates the cycle image present on the main menu during every tick
+        :param grid_display: the game display passed in as an arg
+        :param screen_width: the width of the screen
+        :param screen_height: the height of the screen
+        :param cycle_img: the image of the cycle used in the animation
+        :param cycle_rect: the rectangle containing the image of the cycle in the animation
+        :param start_x: leftmost point of the image during animation
+        :param end_x: rightmost point of the image during animation
+        :param step: pixels to move on each call"""
+
+    if cycle_rect.right >= end_x:
+        cycle_rect.left = start_x
+    else:
+        cycle_rect.move(step, 0)
+
+    grid_display.blit(cycle_img, cycle_rect)
+
+'''
+def animate_menu(grid_display, screen_width, screen_height):
+    """creates an animation above the text in the main menu
+        :param grid_display: the game display passed in as an arg
+        :param screen_width: the width of the screen
+        :param screen_height: the height of the screen"""
+
+    # get the image and rect of the lightcycle
+    cycle_img, cycle_rect = get_image("assets", "lightcycle.png")
+
+    # create the sprite object
+    cycle_sprite = CycleSprite(cycle_img, cycle_rect, screen_height*.1, screen_width*.33, screen_height*.66, 2)
+
+    grid_display.blit(cycle_img, cycle_rect)
+    cycle_rect.move(2, 0)
+    print cycle_rect.left
+    # place in sprite group for ease of drawing and updating
+    sprite_render = pygame.sprite.RenderPlain(cycle_sprite)
+    sprite_render.update()
+    sprite_render.draw(grid_display)
+
+
+def update_cycle():
+    pass
+
+
+class CycleSprite(pygame.sprite.Sprite):
+    """a sprite of a cycle image, used for animation on main menu, variables stored include:
+            sprite_img, the image of the sprite
+            sprite_rect, the rectangle containing the image"""
+    def __init__(self, img, rect, start_y, start_x, end_x, step):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = img
+        self.rect = rect
+        self.rect.top = start_y
+        self.rect.left = start_x
+        self.start_x = start_x
+        self.end_x = end_x
+        self.step = step
+
+    def update(self):
+        """move the image based on given dimensions"""
+        if self.rect.right >= self.end_x:
+            self.rect.left = self.start_x
+
+        self.rect.left += self.step
+'''
+
+def get_image(folder_name, file_name):
+    """retrieves an image from a folder, implementing an exception in case it does not exist
+        :param file_name: the name of the image in the given folder
+        :param folder_name: the name of the folder to look in"""
+    file_path = os.path.join(folder_name, file_name)
+    try:
+        final_image = pygame.image.load(file_path)
+    except pygame.error, message:
+        print 'Cannot find image: ', folder_name, "/", file_name
+        raise message
+    final_image = final_image.convert()
+
+    return final_image, final_image.get_rect()
 
 
 '''end main menu methods'''
@@ -188,8 +288,8 @@ def display_help(grid_display, button_list, text_color, screen_width, screen_hei
                      screen_height * .1, grid_display, text_color, screen_width, screen_height)
 
     # draws dividing line between the first and second set of instructions
-    pygame.draw.line(grid_display, text_color, (screen_width*.35, screen_height * .08),
-                     (screen_width*.35, screen_height * .6))
+    pygame.draw.line(grid_display, text_color, (screen_width * .35, screen_height * .08),
+                     (screen_width * .35, screen_height * .6))
 
     # All text for player 3
     player_3_controls = ["J", "L", "I", "K"]
@@ -197,8 +297,8 @@ def display_help(grid_display, button_list, text_color, screen_width, screen_hei
                      screen_height * .1, grid_display, text_color, screen_width, screen_height)
 
     # draws divide line between the 2nd and 3rd set of instructions
-    pygame.draw.line(grid_display, text_color, (screen_width*.66, screen_height * .08),
-                     (screen_width*.66, screen_height * .6))
+    pygame.draw.line(grid_display, text_color, (screen_width * .66, screen_height * .08),
+                     (screen_width * .66, screen_height * .6))
 
     # makes the back button visible
     for button in button_list:
@@ -256,6 +356,7 @@ def create_help_text(player_name, control_list, start_x, start_y, grid_display, 
     center_text.centery += (screen_height * .1)
     grid_display.blit(text_down, center_text)
 
+
 '''end help menu methods'''
 '''pause menu methods'''
 
@@ -285,6 +386,7 @@ def pause_game(grid_display, button_list, text_color, screen_width, screen_heigh
         if (button.info == "Continue" and text != "Game Over") or button.info == "Reset":
             button.draw_button(grid_display)
             button.set_click()
+
 
 '''end pause menu methods'''
 '''buttons buttons buttons'''
@@ -364,6 +466,7 @@ def reset_buttons(button_list):
         :param button_list: list of all buttons present in the game"""
     for button in button_list:
         button.reset_click()
+
 
 '''end buttons buttons buttons'''
 '''You've reached the end of the file?'''
