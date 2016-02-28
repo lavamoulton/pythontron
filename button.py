@@ -9,10 +9,10 @@ class Button(object):
         the color of the text
         the font of the text"""
     # gotta initialize it
-    def __init__(self, in_rect, text, color, font):
+    def __init__(self, in_rect, text, text_color, outline_color, font):
         self.button_rect = in_rect
-        self.button_font = font.render(text, 1, (230, 230, 230))
-        self.color = color
+        self.button_font = font.render(text, 1, text_color)
+        self.outline_color = outline_color
         self.info = text
         self.center_text = self.button_font.get_rect()
         self.center_text.centerx = self.button_rect.centerx
@@ -20,7 +20,7 @@ class Button(object):
         self.click = False
 
     def draw_button(self, display):
-        pygame.draw.rect(display, self.color, self.button_rect, 2)
+        pygame.draw.rect(display, self.outline_color, self.button_rect, 2)
         display.blit(self.button_font, self.center_text)
 
     def check_click(self, pos_x, pos_y):

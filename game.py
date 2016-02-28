@@ -3,47 +3,28 @@ from button import *
 from pygame import *
 import sys
 
-'''initial vars'''
-GAME_CLOCK = 30
-SCREEN_WIDTH = 1024
-SCREEN_HEIGHT = 1024
-GRID_WIDTH = 128
-GRID_HEIGHT = 128
-BOX_WIDTH = SCREEN_WIDTH / GRID_WIDTH
-BOX_HEIGHT = SCREEN_HEIGHT / GRID_HEIGHT
-
-'''colors, colors everywhere'''
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GRAY = (192, 192, 192)
-BLUE = (0, 0, 255)
-RED = (255, 0, 0)
-
 
 def main():
     """main function, contains the main game loop"""
 
     # this game has got to start somewhere, let's initialize some things
     pygame.init()
-    global FPS_CLOCK
-    global GRID_DISPLAY
-    global TITLE_FONT
-    global BUTTON_FONT
-    global HELP_FONT
-    global button_list
-
-    # create some fonts for later
-    TITLE_FONT = pygame.font.SysFont("monospace", SCREEN_WIDTH / 15)
-    BUTTON_FONT = pygame.font.SysFont("monospace", SCREEN_WIDTH / 20)
-    HELP_FONT = pygame.font.SysFont("monospace", SCREEN_WIDTH / 40)
+    game_clock = 30
+    screen_width = 1024
+    screen_height = 1024
+    grid_width = 128
+    grid_height = 128
+    box_width = screen_width / grid_width
+    box_height = screen_height / grid_height
 
     # and now some important vars
-    FPS_CLOCK = pygame.time.Clock()
-    GRID_DISPLAY = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    fps_clock = pygame.time.Clock()
+    grid_display = pygame.display.set_mode((screen_width, screen_height))
     game_status = "Menu"
     num_players = 0
-    game_grid = gen_grid()  # initializes 2D array representing the grid
-    button_list = create_buttons()  # creates all necessary buttons
+    game_grid = gen_grid(grid_width, grid_height)  # initializes 2D array representing the grid
+    button_list = create_buttons(grid_display, Color("Gray"), Color("Blue"),
+                                 screen_width, screen_height)  # creates all necessary buttons
 
     # misc
     pygame.display.set_caption("PyTron!")
@@ -51,14 +32,14 @@ def main():
     # it's time to loop!
     while True:
         # gotta reset some stuff each time
-        GRID_DISPLAY.fill(BLACK)
-        reset_buttons()
+        grid_display.fill(Color("Black"))
+        reset_buttons(button_list)
 
         # what state are we in?
         if game_status == "Menu":
-            display_menu()
+            display_menu(grid_display, button_list, Color("White"), screen_width, screen_height)
         elif game_status == "Help":
-            display_help()
+            display_help(grid_display, button_list, Color("White"), screen_width, screen_height)
         elif game_status == "Playing":
             pass
         elif game_status == "Paused":
@@ -115,179 +96,240 @@ def main():
         pygame.display.update()
 
         # tick tock tick tock
-        FPS_CLOCK.tick(GAME_CLOCK)
+        fps_clock.tick(game_clock)
 
 
-def gen_grid():
-    """creates a 2D array representing the grid"""
+'''grid methods'''
+
+
+def gen_grid(grid_width, grid_height):
+    """creates a 2D array representing the grid
+        :param grid_width: the number of squares in the grid's width
+        :param grid_height: the number of squares in the grid's height"""
     grid = []
-    for x in range(0, GRID_WIDTH):
+    for x in range(0, grid_width):
         grid.append([])
-        for y in range(0, GRID_HEIGHT):
+        for y in range(0, grid_height):
             grid[x].append(False)
     return grid
 
 
-def reset_buttons():
-    """sets all buttons to be non clickable"""
-    for button in button_list:
-        button.reset_click()
-
+'''end grid methods'''
 '''main menu methods'''
 
 
-def display_menu():
-    """Functions to display the main menu and activate relevant buttons"""
-    draw_menu_text()
+def display_menu(grid_display, button_list, text_color, screen_width, screen_height):
+    """Functions to display the main menu and activate relevant buttons
+        :param grid_display: the game display passed in as an arg
+        :param button_list: list of all buttons present in the game
+        :param text_color: color of the text created
+        :param screen_width: the width of the screen
+        :param screen_height: the height of the screen"""
+
+    draw_menu_text(grid_display, text_color, screen_width, screen_height)
 
     for button in button_list:
         if button.info != "Back" and button.info != "Continue" and button.info != "Reset":
-            button.draw_button(GRID_DISPLAY)
+            button.draw_button(grid_display)
             button.set_click()
 
 
-def draw_menu_text():
-    """Draws text present in the main menu, not including the buttons"""
-    menu_font = TITLE_FONT.render("PyTron!", 1, WHITE)
-    center_text = menu_font.get_rect()
-    center_text.centerx = GRID_DISPLAY.get_rect().centerx
-    GRID_DISPLAY.blit(menu_font, center_text)
+def draw_menu_text(grid_display, text_color, screen_width, screen_height):
+    """Draws text present in the main menu, not including the buttons
+        :param grid_display: the game display passed in as an arg
+        :param text_color: color of the text created
+        :param screen_width: the width of the screen
+        :param screen_height: the height of the screen"""
 
-    more_players = TITLE_FONT.render("Number of Players:", 1, WHITE)
+    # create title font
+    title_font = pygame.font.SysFont("monospace", screen_width / 15)
+
+    menu_font = title_font.render("PyTron!", 1, text_color)
+    center_text = menu_font.get_rect()
+    center_text.centerx = grid_display.get_rect().centerx
+    grid_display.blit(menu_font, center_text)
+
+    more_players = title_font.render("Number of Players:", 1, text_color)
     center_text = more_players.get_rect()
-    center_text.centerx = GRID_DISPLAY.get_rect().centerx
-    center_text.centery = SCREEN_HEIGHT * .25
-    GRID_DISPLAY.blit(more_players, center_text)
+    center_text.centerx = grid_display.get_rect().centerx
+    center_text.centery = screen_height * .25
+    grid_display.blit(more_players, center_text)
+
+
+def animate_menu():
+    """creates an animation above the text in the main menu"""
 
 
 '''end main menu methods'''
 '''help menu methods'''
 
 
-def display_help():
-    """Draws text on the help menu, including controls for all potential players"""
+def display_help(grid_display, button_list, text_color, screen_width, screen_height):
+    """Draws text on the help menu, including controls for all potential players
+        :param grid_display: the game display passed in as an arg
+        :param button_list: list of all buttons present in the game
+        :param text_color: color of the text to be created
+        :param screen_width: the width of the screen
+        :param screen_height: the height of the screen"""
 
     # All text for player 1
     player_1_controls = ["Left Arrow Key", "Right Arrow Key", "Up Arrow Key",
                          "Down Arrow Key"]
-    create_help_text("Player 1", player_1_controls, SCREEN_WIDTH * .15,
-                     SCREEN_HEIGHT * .1)
+    create_help_text("Player 1", player_1_controls, screen_width * .15,
+                     screen_height * .1, grid_display, text_color, screen_width, screen_height)
 
     # All text for player 2
     player_2_controls = ["A", "D", "W", "S"]
-    create_help_text("Player 2", player_2_controls, SCREEN_WIDTH * .5,
-                     SCREEN_HEIGHT * .1)
+    create_help_text("Player 2", player_2_controls, screen_width * .5,
+                     screen_height * .1, grid_display, text_color, screen_width, screen_height)
 
     # draws dividing line between the first and second set of instructions
-    pygame.draw.line(GRID_DISPLAY, WHITE, (SCREEN_WIDTH*.35, SCREEN_HEIGHT * .08),
-                     (SCREEN_WIDTH*.35, SCREEN_HEIGHT * .6))
+    pygame.draw.line(grid_display, text_color, (screen_width*.35, screen_height * .08),
+                     (screen_width*.35, screen_height * .6))
 
     # All text for player 3
     player_3_controls = ["J", "L", "I", "K"]
-    create_help_text("Player 3", player_3_controls, SCREEN_WIDTH * .85,
-                     SCREEN_HEIGHT * .1)
+    create_help_text("Player 3", player_3_controls, screen_width * .85,
+                     screen_height * .1, grid_display, text_color, screen_width, screen_height)
 
     # draws divide line between the 2nd and 3rd set of instructions
-    pygame.draw.line(GRID_DISPLAY, WHITE, (SCREEN_WIDTH*.66, SCREEN_HEIGHT * .08),
-                     (SCREEN_WIDTH*.66, SCREEN_HEIGHT * .6))
+    pygame.draw.line(grid_display, text_color, (screen_width*.66, screen_height * .08),
+                     (screen_width*.66, screen_height * .6))
 
     # makes the back button visible
     for button in button_list:
         if button.info == "Back":
-            button.draw_button(GRID_DISPLAY)
+            button.draw_button(grid_display)
             button.set_click()
 
 
-def create_help_text(player_name, control_list, start_x, start_y):
+def create_help_text(player_name, control_list, start_x, start_y, grid_display, text_color,
+                     screen_width, screen_height):
     """consolidated help texts to reuse one method, requires following parameters:
         :param player_name: string, the name to put before "controls"
         :param control_list: list of strings, list of 4 buttons, representing left, right, up, down
         :param start_x: int, the start x value of the CENTER of the rectangle
-        :param start_y: int, the start y value of the CENTER of the rectangle"""
+        :param start_y: int, the start y value of the CENTER of the rectangle
+        :param grid_display: the game display passed in as an arg
+        :param text_color: color of the text to be created
+        :param screen_width: the width of the screen
+        :param screen_height: the height of the screen"""
+
+    # argument checks
+    if not isinstance(player_name, basestring):
+        print ("Player name arg is not a string")
+        return
+    elif len(control_list) is not 4:
+        print ("List of controls is not the correct length")
+        return
+    elif type(start_x) is not float:
+        print("X coordinate is not a number")
+        return
+    elif type(start_y) is not float:
+        print("Y coordinate is not a number")
+        return
+
+    # create font for use in help text
+    help_font = pygame.font.SysFont("monospace", screen_width / 40)
+
     # Fonts rendered initially
-    text_font = HELP_FONT.render(player_name + " Controls:", 1, WHITE)
-    text_left = HELP_FONT.render("Left: " + control_list[0], 1, WHITE)
-    text_right = HELP_FONT.render("Right: " + control_list[1], 1, WHITE)
-    text_up = HELP_FONT.render("Up: " + control_list[2], 1, WHITE)
-    text_down = HELP_FONT.render("Down: " + control_list[3], 1, WHITE)
+    text_font = help_font.render(player_name + " Controls:", 1, text_color)
+    text_left = help_font.render("Left: " + control_list[0], 1, text_color)
+    text_right = help_font.render("Right: " + control_list[1], 1, text_color)
+    text_up = help_font.render("Up: " + control_list[2], 1, text_color)
+    text_down = help_font.render("Down: " + control_list[3], 1, text_color)
 
     center_text = text_font.get_rect()
     center_text.centerx = start_x
     center_text.centery = start_y
-    GRID_DISPLAY.blit(text_font, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .15)
-    GRID_DISPLAY.blit(text_left, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(text_right, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(text_up, center_text)
-    center_text.centery += (SCREEN_HEIGHT * .1)
-    GRID_DISPLAY.blit(text_down, center_text)
+    grid_display.blit(text_font, center_text)
+    center_text.centery += (screen_height * .15)
+    grid_display.blit(text_left, center_text)
+    center_text.centery += (screen_height * .1)
+    grid_display.blit(text_right, center_text)
+    center_text.centery += (screen_height * .1)
+    grid_display.blit(text_up, center_text)
+    center_text.centery += (screen_height * .1)
+    grid_display.blit(text_down, center_text)
 
 '''end help menu methods'''
 '''buttons buttons buttons'''
 
 
-def create_buttons():
+def create_buttons(grid_display, text_color, outline_color, screen_width, screen_height):
     """creates ALL buttons used in the various menus in game
+        various methods activate the click capabilities and visuals of the buttons
+        :param grid_display: the game display passed in as an arg
+        :param text_color: color of the text inside the buttons
+        :param outline_color: color of the rectangle surrounding the buttons
+        :param screen_width: the width of the screen
+        :param screen_height: the height of the screen"""
 
-        various methods activate the click capabilities and visuals of the buttons"""
     all_button = []
 
+    # create font used inside the buttons
+    button_font = pygame.font.SysFont("monospace", screen_width / 20)
+
     # help button
-    temp_font = TITLE_FONT.render("test", 1, WHITE)
+    temp_font = button_font.render("test", 1, text_color)
     center_text = temp_font.get_rect()
-    center_text.centery = SCREEN_HEIGHT * .75
-    center_text.width = SCREEN_WIDTH * .5
-    center_text.centerx = SCREEN_WIDTH * .5
-    help_button = Button(center_text, "Help", GRAY, BUTTON_FONT)
+    center_text.centery = screen_height * .75
+    center_text.width = screen_width * .5
+    center_text.centerx = screen_width * .5
+    help_button = Button(center_text, "Help", text_color, outline_color, button_font)
     all_button.append(help_button)
 
     # 1 player button
     center_text = pygame.Rect.copy(center_text)
-    center_text.left = SCREEN_WIDTH * .27
-    center_text.width = SCREEN_WIDTH * .12
-    center_text.top = SCREEN_HEIGHT * .5
-    center_text.height = SCREEN_HEIGHT * .1
-    one_button = Button(center_text, "1", GRAY, BUTTON_FONT)
+    center_text.left = screen_width * .27
+    center_text.width = screen_width * .12
+    center_text.top = screen_height * .5
+    center_text.height = screen_height * .1
+    one_button = Button(center_text, "1", text_color, outline_color, button_font)
     all_button.append(one_button)
 
     # 2 player button
     center_text = pygame.Rect.copy(center_text)
-    center_text.left = SCREEN_WIDTH * .44
-    two_button = Button(center_text, "2", GRAY, BUTTON_FONT)
+    center_text.left = screen_width * .44
+    two_button = Button(center_text, "2", text_color, outline_color, button_font)
     all_button.append(two_button)
 
     # 3 player button
     center_text = pygame.Rect.copy(center_text)
-    center_text.left = SCREEN_WIDTH * .6
-    three_button = Button(center_text, "3", GRAY, BUTTON_FONT)
+    center_text.left = screen_width * .6
+    three_button = Button(center_text, "3", text_color, outline_color, button_font)
     all_button.append(three_button)
 
     # back button
     center_text = pygame.Rect.copy(center_text)
-    center_text.width = SCREEN_WIDTH * .25
-    center_text.centerx = GRID_DISPLAY.get_rect().centerx
-    center_text.centery = SCREEN_HEIGHT * .8
-    back_button = Button(center_text, "Back", GRAY, BUTTON_FONT)
+    center_text.width = screen_width * .25
+    center_text.centerx = grid_display.get_rect().centerx
+    center_text.centery = screen_height * .8
+    back_button = Button(center_text, "Back", text_color, outline_color, button_font)
     all_button.append(back_button)
 
     # continue button
     center_text = pygame.Rect.copy(center_text)
-    center_text.centery = SCREEN_HEIGHT * .75
-    center_text.centerx = SCREEN_WIDTH * .5
-    pause_button = Button(center_text, "Continue", GRAY, BUTTON_FONT)
+    center_text.centery = screen_height * .75
+    center_text.centerx = screen_width * .5
+    pause_button = Button(center_text, "Continue", text_color, outline_color, button_font)
     all_button.append(pause_button)
 
     # reset button
     center_text = pygame.Rect.copy(center_text)
-    center_text.centery = SCREEN_HEIGHT * .88
-    center_text.centerx = SCREEN_WIDTH * .5
-    reset_button = Button(center_text, "Reset", GRAY, BUTTON_FONT)
+    center_text.centery = screen_height * .88
+    center_text.centerx = screen_width * .5
+    reset_button = Button(center_text, "Reset", text_color, outline_color, button_font)
     all_button.append(reset_button)
 
     return all_button
 
+
+def reset_buttons(button_list):
+    """sets all buttons to be non clickable
+        :param button_list: list of all buttons present in the game"""
+    for button in button_list:
+        button.reset_click()
 
 '''end buttons buttons buttons'''
 '''You've reached the end of the file?'''
