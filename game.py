@@ -39,11 +39,11 @@ def main():
         # what state are we in?
         if game_status == "Menu":
             display_menu(grid_display, button_list, Color("White"), screen_width, screen_height, cycle_img,
-                        cycle_rect)
+                         cycle_rect)
         elif game_status == "Help":
             display_help(grid_display, button_list, Color("White"), screen_width, screen_height)
         elif game_status == "Playing":
-            pass
+            play_game(grid_display, screen_width, screen_height, box_width, box_height)
         elif game_status == "Paused":
             pause_game(grid_display, button_list, Color("White"), screen_width, screen_height, game_status)
         elif game_status == "Dead":
@@ -81,6 +81,7 @@ def main():
                             # TODO: Add methods to reset the state of the game
                             game_status = "Playing"
 
+            # these key stroke events will only occur if the game is currently "Playing"
             elif game_event.type == KEYDOWN and game_status == "Playing":
                 if game_event.key == K_UP:
                     # Player1.setDirection('up')
@@ -120,7 +121,36 @@ def gen_grid(grid_width, grid_height):
     return grid
 
 
+def draw_grid_lines(grid_display, screen_width, screen_height, box_width, box_height, line_color):
+    """draws the lines of the grid during each play tick based on the screen and box dimensions
+        :param grid_display: the game display passed in as an arg
+        :param screen_width: the width of the screen
+        :param screen_height: the height of the screen
+        :param box_width: the screen_width divided by the number of boxes to have in the grid
+        :param box_height: the screen_height divided by the number of boxes to have in the grid
+        :param line_color: the color to make the grid lines"""
+    for x in range(0, screen_width, box_width):
+        for y in range(0, screen_height, box_height):
+            pygame.draw.line(grid_display, line_color, (x, 0), (x, screen_height))
+            pygame.draw.line(grid_display, line_color, (0, y), (screen_width, y))
+
+
 '''end grid methods'''
+'''play game methods'''
+
+
+def play_game(grid_display, screen_width, screen_height, box_width, box_height):
+    """overall method to handle playing the game in the "Playing" game_state
+        this is called from the main game loop, and all other additional methods are added here
+        :param grid_display: the game display passed in as an arg
+        :param screen_width: the width of the screen
+        :param screen_height: the height of the screen
+        :param box_width: the screen_width divided by the number of boxes to have in the grid
+        :param box_height: the screen_height divided by the number of boxes to have in the grid"""
+    draw_grid_lines(grid_display, screen_width, screen_height, box_width, box_height, Color("White"))
+
+
+'''end play game methods'''
 '''main menu methods'''
 
 
