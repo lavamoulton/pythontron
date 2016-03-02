@@ -167,7 +167,7 @@ def display_menu(grid_display, button_list, text_color, screen_width, screen_hei
 
     draw_menu_text(grid_display, text_color, screen_width, screen_height)
 
-    animate_menu(grid_display, screen_width, screen_height, cycle_img, cycle_rect, screen_width*.2,
+    animate_menu(grid_display, cycle_img, cycle_rect, screen_width*.2,
                  screen_width*.8, 2)
 
     for button in button_list:
@@ -213,12 +213,9 @@ def begin_anim(folder_name, file_name, screen_width, screen_height):
     return cycle_img, cycle_rect
 
 
-def animate_menu(grid_display, screen_width, screen_height, cycle_img, cycle_rect, start_x,
-                 end_x, step):
+def animate_menu(grid_display, cycle_img, cycle_rect, start_x, end_x, step):
     """animates the cycle image present on the main menu during every tick
         :param grid_display: the game display passed in as an arg
-        :param screen_width: the width of the screen
-        :param screen_height: the height of the screen
         :param cycle_img: the image of the cycle used in the animation
         :param cycle_rect: the rectangle containing the image of the cycle in the animation
         :param start_x: leftmost point of the image during animation
@@ -228,11 +225,8 @@ def animate_menu(grid_display, screen_width, screen_height, cycle_img, cycle_rec
     if cycle_rect.right >= end_x:
         cycle_rect.left = start_x
     else:
-        cycle_rect = cycle_rect.move_ip(step, 0)
-        # print cycle_rect.move(step, 0)
-        print cycle_rect
+        cycle_rect.move_ip(step, 0)
 
-    print cycle_rect.left
     grid_display.blit(cycle_img, cycle_rect)
 
 
