@@ -1,7 +1,8 @@
 # necessary imports
 from button import *
 from pygame import *
-import sys, os
+import sys
+import os
 
 
 def main():
@@ -166,8 +167,8 @@ def display_menu(grid_display, button_list, text_color, screen_width, screen_hei
 
     draw_menu_text(grid_display, text_color, screen_width, screen_height)
 
-    animate_menu(grid_display, screen_width, screen_height, cycle_img, cycle_rect, screen_width*.33,
-                 screen_width*.66, 2)
+    animate_menu(grid_display, screen_width, screen_height, cycle_img, cycle_rect, screen_width*.2,
+                 screen_width*.8, 2)
 
     for button in button_list:
         if button.info != "Back" and button.info != "Continue" and button.info != "Reset":
@@ -207,7 +208,7 @@ def begin_anim(folder_name, file_name, screen_width, screen_height):
     # get the image and rect of the lightcycle
     cycle_img, cycle_rect = get_image(folder_name, file_name)
     cycle_rect.top = screen_height * .1
-    cycle_rect.left = screen_width * .33
+    cycle_rect = cycle_rect.move(screen_width * .7, 0)
 
     return cycle_img, cycle_rect
 
@@ -227,60 +228,18 @@ def animate_menu(grid_display, screen_width, screen_height, cycle_img, cycle_rec
     if cycle_rect.right >= end_x:
         cycle_rect.left = start_x
     else:
-        cycle_rect.move(step, 0)
+        cycle_rect = cycle_rect.move_ip(step, 0)
+        # print cycle_rect.move(step, 0)
+        print cycle_rect
 
-    grid_display.blit(cycle_img, cycle_rect)
-
-'''
-def animate_menu(grid_display, screen_width, screen_height):
-    """creates an animation above the text in the main menu
-        :param grid_display: the game display passed in as an arg
-        :param screen_width: the width of the screen
-        :param screen_height: the height of the screen"""
-
-    # get the image and rect of the lightcycle
-    cycle_img, cycle_rect = get_image("assets", "lightcycle.png")
-
-    # create the sprite object
-    cycle_sprite = CycleSprite(cycle_img, cycle_rect, screen_height*.1, screen_width*.33, screen_height*.66, 2)
-
-    grid_display.blit(cycle_img, cycle_rect)
-    cycle_rect.move(2, 0)
     print cycle_rect.left
-    # place in sprite group for ease of drawing and updating
-    sprite_render = pygame.sprite.RenderPlain(cycle_sprite)
-    sprite_render.update()
-    sprite_render.draw(grid_display)
+    grid_display.blit(cycle_img, cycle_rect)
 
-
-def update_cycle():
-    pass
-
-
-class CycleSprite(pygame.sprite.Sprite):
-    """a sprite of a cycle image, used for animation on main menu, variables stored include:
-            sprite_img, the image of the sprite
-            sprite_rect, the rectangle containing the image"""
-    def __init__(self, img, rect, start_y, start_x, end_x, step):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = img
-        self.rect = rect
-        self.rect.top = start_y
-        self.rect.left = start_x
-        self.start_x = start_x
-        self.end_x = end_x
-        self.step = step
-
-    def update(self):
-        """move the image based on given dimensions"""
-        if self.rect.right >= self.end_x:
-            self.rect.left = self.start_x
-
-        self.rect.left += self.step
-'''
 
 def get_image(folder_name, file_name):
     """retrieves an image from a folder, implementing an exception in case it does not exist
+        :returns final_image: a surface of the image that is attempting to be loaded
+        :returns final_image.get_rect(): the rectangle surrounding this image
         :param file_name: the name of the image in the given folder
         :param folder_name: the name of the folder to look in"""
     file_path = os.path.join(folder_name, file_name)
