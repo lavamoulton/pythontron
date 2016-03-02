@@ -76,6 +76,8 @@ def main():
                             game_status = "Playing"
                         elif button.info == "Back":
                             game_status = "Menu"
+                        elif button.info == "Menu":
+                            game_status = "Menu"
                         elif button.info == "Continue":
                             game_status = "Playing"
                         elif button.info == "Reset":
@@ -174,7 +176,8 @@ def display_menu(grid_display, button_list, text_color, screen_width, screen_hei
                  screen_width*.8, 2, Color("Blue"))
 
     for button in button_list:
-        if button.info != "Back" and button.info != "Continue" and button.info != "Reset":
+        if button.info != "Back" and button.info != "Continue" and button.info != "Reset" and \
+                button.info != "Menu":
             button.draw_button(grid_display)
             button.set_click()
 
@@ -372,7 +375,8 @@ def pause_game(grid_display, button_list, text_color, screen_width, screen_heigh
 
     # will not draw continue button if the game has already ended
     for button in button_list:
-        if (button.info == "Continue" and text != "Game Over") or button.info == "Reset":
+        if (button.info == "Continue" and text != "Game Over") or button.info == "Reset"\
+                or button.info == "Menu":
             button.draw_button(grid_display)
             button.set_click()
 
@@ -435,17 +439,24 @@ def create_buttons(grid_display, text_color, outline_color, screen_width, screen
 
     # continue button
     center_text = pygame.Rect.copy(center_text)
-    center_text.centery = screen_height * .75
+    center_text.centery = screen_height * .62
     center_text.centerx = screen_width * .5
     pause_button = Button(center_text, "Continue", text_color, outline_color, button_font)
     all_button.append(pause_button)
 
     # reset button
     center_text = pygame.Rect.copy(center_text)
-    center_text.centery = screen_height * .88
+    center_text.centery = screen_height * .75
     center_text.centerx = screen_width * .5
     reset_button = Button(center_text, "Reset", text_color, outline_color, button_font)
     all_button.append(reset_button)
+
+    # return to menu button
+    center_text = pygame.Rect.copy(center_text)
+    center_text.centery = screen_height * .88
+    center_text.centerx = screen_width * .5
+    back_to_menu_button = Button(center_text, "Menu", text_color, outline_color, button_font)
+    all_button.append(back_to_menu_button)
 
     return all_button
 
