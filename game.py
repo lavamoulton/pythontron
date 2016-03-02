@@ -99,6 +99,7 @@ def main():
                 # pause the game with the "space" button
                 elif game_event.key == K_SPACE:
                     game_status = "Paused"
+                # go back to main menu with the "escape" button
                 elif game_event.key == K_ESCAPE:
                     game_status = "Menu"
 
