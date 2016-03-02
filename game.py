@@ -13,8 +13,8 @@ def main():
     game_clock = 30
     screen_width = 1024
     screen_height = 1024
-    grid_width = 128
-    grid_height = 128
+    grid_width = 64
+    grid_height = 64
     box_width = screen_width / grid_width
     box_height = screen_height / grid_height
 
@@ -98,7 +98,9 @@ def main():
                     pass
                 # pause the game with the "space" button
                 elif game_event.key == K_SPACE:
-                    game_status = "Dead"
+                    game_status = "Paused"
+                elif game_event.key == K_ESCAPE:
+                    game_status = "Menu"
 
         # draw current state of screen
         pygame.display.update()
@@ -148,7 +150,7 @@ def play_game(grid_display, screen_width, screen_height, box_width, box_height):
         :param screen_height: the height of the screen
         :param box_width: the screen_width divided by the number of boxes to have in the grid
         :param box_height: the screen_height divided by the number of boxes to have in the grid"""
-    draw_grid_lines(grid_display, screen_width, screen_height, box_width, box_height, Color("White"))
+    draw_grid_lines(grid_display, screen_width, screen_height, box_width, box_height, Color("Gray"))
 
 
 '''end play game methods'''
@@ -168,7 +170,7 @@ def display_menu(grid_display, button_list, text_color, screen_width, screen_hei
     draw_menu_text(grid_display, text_color, screen_width, screen_height)
 
     animate_menu(grid_display, cycle_img, cycle_rect, screen_width*.2,
-                 screen_width*.8, 2)
+                 screen_width*.8, 2, Color("Blue"))
 
     for button in button_list:
         if button.info != "Back" and button.info != "Continue" and button.info != "Reset":
@@ -213,20 +215,23 @@ def begin_anim(folder_name, file_name, screen_width, screen_height):
     return cycle_img, cycle_rect
 
 
-def animate_menu(grid_display, cycle_img, cycle_rect, start_x, end_x, step):
+def animate_menu(grid_display, cycle_img, cycle_rect, start_x, end_x, step, wall_color):
     """animates the cycle image present on the main menu during every tick
         :param grid_display: the game display passed in as an arg
         :param cycle_img: the image of the cycle used in the animation
         :param cycle_rect: the rectangle containing the image of the cycle in the animation
         :param start_x: leftmost point of the image during animation
         :param end_x: rightmost point of the image during animation
-        :param step: pixels to move on each call"""
+        :param step: pixels to move on each call
+        :param wall_color: color of the wall to draw behind the cycle"""
 
     if cycle_rect.right >= end_x:
         cycle_rect.left = start_x
     else:
         cycle_rect.move_ip(step, 0)
 
+    pygame.draw.rect(grid_display, wall_color, (start_x, cycle_rect.top + 5, cycle_rect.left - start_x + 40,
+                                                cycle_rect.height - 10))
     grid_display.blit(cycle_img, cycle_rect)
 
 
