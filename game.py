@@ -375,7 +375,7 @@ def pause_game(grid_display, button_list, text_color, screen_width, screen_heigh
 
     # will not draw continue button if the game has already ended
     for button in button_list:
-        if (button.info == "Continue" and text != "Game Over") or button.info == "Reset"\
+        if (button.info == "Continue" and text != "Game Over") or button.info == "Reset" \
                 or button.info == "Menu":
             button.draw_button(grid_display)
             button.set_click()
@@ -405,57 +405,50 @@ def create_buttons(grid_display, text_color, outline_color, screen_width, screen
     center_text.centery = screen_height * .75
     center_text.width = screen_width * .5
     center_text.centerx = screen_width * .5
-    help_button = Button(center_text, "Help", text_color, outline_color, button_font)
+    help_button = Button(center_text.copy(), "Help", text_color, outline_color, button_font)
     all_button.append(help_button)
 
     # 1 player button
-    center_text = pygame.Rect.copy(center_text)
     center_text.left = screen_width * .27
     center_text.width = screen_width * .12
     center_text.top = screen_height * .5
     center_text.height = screen_height * .1
-    one_button = Button(center_text, "1", text_color, outline_color, button_font)
+    one_button = Button(center_text.copy(), "1", text_color, outline_color, button_font)
     all_button.append(one_button)
 
     # 2 player button
-    center_text = pygame.Rect.copy(center_text)
     center_text.left = screen_width * .44
-    two_button = Button(center_text, "2", text_color, outline_color, button_font)
+    two_button = Button(center_text.copy(), "2", text_color, outline_color, button_font)
     all_button.append(two_button)
 
     # 3 player button
-    center_text = pygame.Rect.copy(center_text)
     center_text.left = screen_width * .6
-    three_button = Button(center_text, "3", text_color, outline_color, button_font)
+    three_button = Button(center_text.copy(), "3", text_color, outline_color, button_font)
     all_button.append(three_button)
 
     # back button
-    center_text = pygame.Rect.copy(center_text)
     center_text.width = screen_width * .25
     center_text.centerx = grid_display.get_rect().centerx
     center_text.centery = screen_height * .8
-    back_button = Button(center_text, "Back", text_color, outline_color, button_font)
+    back_button = Button(center_text.copy(), "Back", text_color, outline_color, button_font)
     all_button.append(back_button)
 
     # continue button
-    center_text = pygame.Rect.copy(center_text)
     center_text.centery = screen_height * .62
     center_text.centerx = screen_width * .5
-    pause_button = Button(center_text, "Continue", text_color, outline_color, button_font)
+    pause_button = Button(center_text.copy(), "Continue", text_color, outline_color, button_font)
     all_button.append(pause_button)
 
     # reset button
-    center_text = pygame.Rect.copy(center_text)
     center_text.centery = screen_height * .75
     center_text.centerx = screen_width * .5
-    reset_button = Button(center_text, "Reset", text_color, outline_color, button_font)
+    reset_button = Button(center_text.copy(), "Reset", text_color, outline_color, button_font)
     all_button.append(reset_button)
 
     # return to menu button
-    center_text = pygame.Rect.copy(center_text)
     center_text.centery = screen_height * .88
     center_text.centerx = screen_width * .5
-    back_to_menu_button = Button(center_text, "Menu", text_color, outline_color, button_font)
+    back_to_menu_button = Button(center_text.copy(), "Menu", text_color, outline_color, button_font)
     all_button.append(back_to_menu_button)
 
     return all_button
