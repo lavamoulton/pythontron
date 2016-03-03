@@ -42,16 +42,15 @@ class Cycle(object):
 
         grid[self.pos_x][self.pos_y] = self.color
 
-        if self.direction == "R":
-            self.pos_x += 1
-        elif self.direction == "L":
-            self.pos_x -= 1
-        elif self.direction == "U":
-            self.pos_y -= 1
-        elif self.direction == "D":
-            self.pos_y += 1
-
-        return grid
+        if not self.dead:
+            if self.direction == "R":
+                self.pos_x += 1
+            elif self.direction == "L":
+                self.pos_x -= 1
+            elif self.direction == "U":
+                self.pos_y -= 1
+            elif self.direction == "D":
+                self.pos_y += 1
 
     def set_direction(self, direction):
         """sets the direction the cycle is heading
@@ -71,9 +70,9 @@ class Cycle(object):
         """checks if the cycle has collided with another object
             :param grid: the game grid passed in containing all other game objects"""
 
-        if self.pos_x < 1 or self.pos_x > len(grid):
+        if self.pos_x < 1 or self.pos_x > len(grid) - 2:
             self.kill_cycle(grid)
-        elif self.pos_y < 1 or self.pos_y > len(grid[0]):
+        elif self.pos_y < 1 or self.pos_y > len(grid[0]) - 2:
             self.kill_cycle(grid)
         elif grid[self.pos_x][self.pos_y]:
             self.kill_cycle(grid)
@@ -84,7 +83,7 @@ class Cycle(object):
             :param grid: the game grid passed in containing all other game objects"""
 
         self.dead = True
-        grid = self.kill_walls(grid)
+        self.kill_walls(grid)
 
         return grid
 
@@ -110,8 +109,6 @@ class Cycle(object):
             grid[self.pos_x][self.pos_y - 1] = False
         grid[self.pos_x][self.pos_y] = False
 
-        return grid
-
     def reset_position(self, pos_x, pos_y, direction):
         """puts the cycle in the given position with the given direction
             :param pos_x: x position to use
@@ -121,3 +118,9 @@ class Cycle(object):
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.direction = direction
+
+    def is_dead(self):
+        """returns True if the cycle is dead
+            returns False otherwise"""
+
+        return self.dead
