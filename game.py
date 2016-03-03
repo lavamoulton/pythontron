@@ -27,6 +27,7 @@ def main():
     button_list = create_buttons(grid_display, Color("Gray"), Color("Blue"),
                                  screen_width, screen_height)  # creates all necessary buttons
     cycle_img, cycle_rect = begin_anim("assets", "lightcycle.png", screen_width, screen_height)
+    player_list = [] # list of players in the game, will change based on number of human players
 
     # misc
     pygame.display.set_caption("PyTron!")
@@ -44,7 +45,8 @@ def main():
         elif game_status == "Help":
             display_help(grid_display, button_list, Color("White"), screen_width, screen_height)
         elif game_status == "Playing":
-            play_game(grid_display, screen_width, screen_height, box_width, box_height)
+            play_game(grid_display, screen_width, screen_height, box_width, box_height, num_players,
+                      game_grid)
         elif game_status == "Paused":
             pause_game(grid_display, button_list, Color("White"), screen_width, screen_height, game_status)
         elif game_status == "Dead":
@@ -67,12 +69,15 @@ def main():
                             game_status = "Help"
                         elif button.info == "1":
                             num_players = 1
+                            player_list = create_player_list(num_players)
                             game_status = "Playing"
                         elif button.info == "2":
                             num_players = 2
+                            player_list = create_player_list(num_players)
                             game_status = "Playing"
                         elif button.info == "3":
                             num_players = 3
+                            player_list = create_player_list(num_players)
                             game_status = "Playing"
                         elif button.info == "Back":
                             game_status = "Menu"
@@ -142,17 +147,38 @@ def draw_grid_lines(grid_display, screen_width, screen_height, box_width, box_he
 
 
 '''end grid methods'''
+'''game actor methods'''
+
+
+def create_player_list(num_players):
+    """will create a list of players based on the number of human players selected and return it
+        :param num_players: number of human players to include in the list"""
+    # TODO: remove placeholders with actual cycle objects
+    if num_players == 0:
+        print "something broke, 0 players added"
+        return []
+    elif num_players == 1:
+        return ["player", "ai", "ai", "ai"]
+    elif num_players == 2:
+        return ["player", "player", "ai", "ai"]
+    elif num_players == 3:
+        return ["player", "player", "player", "ai"]
+
+'''end game actor methods'''
 '''play game methods'''
 
 
-def play_game(grid_display, screen_width, screen_height, box_width, box_height):
+def play_game(grid_display, screen_width, screen_height, box_width, box_height, num_players, game_grid):
     """overall method to handle playing the game in the "Playing" game_state
         this is called from the main game loop, and all other additional methods are added here
         :param grid_display: the game display passed in as an arg
         :param screen_width: the width of the screen
         :param screen_height: the height of the screen
         :param box_width: the screen_width divided by the number of boxes to have in the grid
-        :param box_height: the screen_height divided by the number of boxes to have in the grid"""
+        :param box_height: the screen_height divided by the number of boxes to have in the grid
+        :param num_players: number of human players in the play game state
+        :param game_grid: 2D array representing all objects in the grid"""
+
     draw_grid_lines(grid_display, screen_width, screen_height, box_width, box_height, Color("Gray"))
 
 
