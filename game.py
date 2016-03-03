@@ -23,7 +23,6 @@ def main():
     fps_clock = pygame.time.Clock()
     grid_display = pygame.display.set_mode((screen_width, screen_height))
     game_status = "Menu"
-    num_players = 0
     game_grid = gen_grid(grid_width, grid_height)  # initializes 2D array representing the grid
     button_list = create_buttons(grid_display, Color("Gray"), Color("Blue"),
                                  screen_width, screen_height)  # creates all necessary buttons
@@ -68,16 +67,13 @@ def main():
                         if button.info == "Help":
                             game_status = "Help"
                         elif button.info == "1":
-                            num_players = 1
-                            player_list = create_player_list(num_players, game_grid)
+                            player_list = create_player_list(1, game_grid)
                             game_status = "Playing"
                         elif button.info == "2":
-                            num_players = 2
-                            player_list = create_player_list(num_players, game_grid)
+                            player_list = create_player_list(2, game_grid)
                             game_status = "Playing"
                         elif button.info == "3":
-                            num_players = 3
-                            player_list = create_player_list(num_players, game_grid)
+                            player_list = create_player_list(3, game_grid)
                             game_status = "Playing"
                         elif button.info == "Back":
                             game_status = "Menu"
@@ -172,12 +168,10 @@ def create_player_list(num_players, game_grid):
     """will create a list of players based on the number of human players selected and return it
         :param num_players: number of human players to include in the list
         :param game_grid: 2D array representing the grid"""
-    if num_players == 0:
-        print "something broke, 0 players added"
-        return []
-    elif num_players == 1:
+
+    if num_players == 1:
         return [Cycle("Player1", 2, 2, "R", Color("Blue")),
-                Cycle("AI", len(game_grid)- 3, len(game_grid[0]) - 3, "L", Color("Red")),
+                Cycle("AI", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
                 Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green")),
                 Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"))]
     elif num_players == 2:
