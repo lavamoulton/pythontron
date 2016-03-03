@@ -1,5 +1,6 @@
 # necessary imports
 from button import *
+from cycle import *
 from pygame import *
 import sys
 import os
@@ -27,7 +28,7 @@ def main():
     button_list = create_buttons(grid_display, Color("Gray"), Color("Blue"),
                                  screen_width, screen_height)  # creates all necessary buttons
     cycle_img, cycle_rect = begin_anim("assets", "lightcycle.png", screen_width, screen_height)
-    player_list = [] # list of players in the game, will change based on number of human players
+    player_list = []  # list of players in the game, will change based on number of human players
 
     # misc
     pygame.display.set_caption("PyTron!")
@@ -45,8 +46,7 @@ def main():
         elif game_status == "Help":
             display_help(grid_display, button_list, Color("White"), screen_width, screen_height)
         elif game_status == "Playing":
-            play_game(grid_display, screen_width, screen_height, box_width, box_height, num_players,
-                      game_grid)
+            play_game(grid_display, screen_width, screen_height, box_width, box_height, game_grid, player_list)
         elif game_status == "Paused":
             pause_game(grid_display, button_list, Color("White"), screen_width, screen_height, game_status)
         elif game_status == "Dead":
@@ -69,15 +69,15 @@ def main():
                             game_status = "Help"
                         elif button.info == "1":
                             num_players = 1
-                            player_list = create_player_list(num_players)
+                            player_list = create_player_list(num_players, game_grid)
                             game_status = "Playing"
                         elif button.info == "2":
                             num_players = 2
-                            player_list = create_player_list(num_players)
+                            player_list = create_player_list(num_players, game_grid)
                             game_status = "Playing"
                         elif button.info == "3":
                             num_players = 3
-                            player_list = create_player_list(num_players)
+                            player_list = create_player_list(num_players, game_grid)
                             game_status = "Playing"
                         elif button.info == "Back":
                             game_status = "Menu"
@@ -146,29 +146,77 @@ def draw_grid_lines(grid_display, screen_width, screen_height, box_width, box_he
             pygame.draw.line(grid_display, line_color, (0, y), (screen_width, y))
 
 
+def draw_grid(grid_display, game_grid, box_width, box_height, border_color):
+    """draws the updated grid state
+        :param grid_display: the game display passed in as an arg
+        :param game_grid: the 2D array representing the entire grid and objects within it
+        :param box_width: width of each box in the grid
+        :param box_height: height of each box in the grid
+        :param border_color: color of the wall enclosing the entire grid"""
+
+    for x in range(0, len(game_grid)):
+        for y in range(0, len(game_grid[0])):
+            if x == 0 or x == len(game_grid) - 1 or y == 0 or y == len(game_grid[0]) - 1:
+                pygame.draw.rect(grid_display, border_color, (x * box_width + 1, y * box_height + 1,
+                                                              box_width - 1, box_height - 1))
+            elif game_grid[x][y]:
+                pygame.draw.rect(grid_display, game_grid[x][y], (x * box_width + 1, y * box_height + 1,
+                                                                 box_width - 1, box_height - 1))
+
+
 '''end grid methods'''
 '''game actor methods'''
 
 
-def create_player_list(num_players):
+def create_player_list(num_players, game_grid):
     """will create a list of players based on the number of human players selected and return it
-        :param num_players: number of human players to include in the list"""
-    # TODO: remove placeholders with actual cycle objects
+        :param num_players: number of human players to include in the list
+        :param game_grid: 2D array representing the grid"""
     if num_players == 0:
         print "something broke, 0 players added"
         return []
     elif num_players == 1:
-        return ["player", "ai", "ai", "ai"]
+        return [Cycle("Player1", 2, 2, "R", Color("Blue")),
+                Cycle("AI", len(game_grid)- 3, len(game_grid[0]) - 3, "L", Color("Red")),
+                Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green")),
+                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"))]
     elif num_players == 2:
-        return ["player", "player", "ai", "ai"]
+        return [Cycle("Player1", 2, 2, "R", Color("Blue")),
+                Cycle("Player2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
+                Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green")),
+                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"))]
     elif num_players == 3:
-        return ["player", "player", "player", "ai"]
+        return [Cycle("Player1", 2, 2, "R", Color("Blue")),
+                Cycle("Player2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
+                Cycle("Player3", len(game_grid) - 3, 2, "D", Color("Green")),
+                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"))]
+
+
+def draw_cycles(grid_display, box_width, box_height, player_list):
+    """draws all the cycles present in the player list
+        :param grid_display: game display passed in as an arg
+        :param box_width: the width of each box in the grid
+        :param box_height: the height of each box in the grid
+        :param player_list: list of game actors"""
+
+    for cycle in player_list:
+        cycle.draw_cycle(grid_display, box_width, box_height)
+
+
+def update_cycles(game_grid, player_list):
+    """updates all cycles in the player list, handles grid updates on previous locations of cycles
+        :param game_grid: grid of all game objects
+        :param player_list: list of game actors in the game"""
+
+    for cycle in player_list:
+        game_grid = cycle.update_cycle(game_grid)
+
 
 '''end game actor methods'''
 '''play game methods'''
 
 
-def play_game(grid_display, screen_width, screen_height, box_width, box_height, num_players, game_grid):
+def play_game(grid_display, screen_width, screen_height, box_width, box_height, game_grid, player_list):
     """overall method to handle playing the game in the "Playing" game_state
         this is called from the main game loop, and all other additional methods are added here
         :param grid_display: the game display passed in as an arg
@@ -176,10 +224,18 @@ def play_game(grid_display, screen_width, screen_height, box_width, box_height, 
         :param screen_height: the height of the screen
         :param box_width: the screen_width divided by the number of boxes to have in the grid
         :param box_height: the screen_height divided by the number of boxes to have in the grid
-        :param num_players: number of human players in the play game state
-        :param game_grid: 2D array representing all objects in the grid"""
+        :param game_grid: 2D array representing all objects in the grid
+        :param player_list: list of game actors present"""
 
+    # methods acting on the grid
     draw_grid_lines(grid_display, screen_width, screen_height, box_width, box_height, Color("Gray"))
+    draw_grid(grid_display, game_grid, box_width, box_height, Color("Gray"))
+
+    # methods acting on the cycles
+    draw_cycles(grid_display, box_width, box_height, player_list)
+    update_cycles(game_grid, player_list)
+
+    pygame.time.wait(100)
 
 
 '''end play game methods'''
