@@ -22,6 +22,7 @@ def main():
     # and now some important vars
     fps_clock = pygame.time.Clock()
     grid_display = pygame.display.set_mode((screen_width, screen_height))
+    num_players = 0
     game_status = "Menu"
     game_grid = gen_grid(grid_width, grid_height)  # initializes 2D array representing the grid
     button_list = create_buttons(grid_display, Color("Gray"), Color("Blue"),
@@ -45,11 +46,14 @@ def main():
         elif game_status == "Help":
             display_help(grid_display, button_list, Color("White"), screen_width, screen_height)
         elif game_status == "Playing":
-            play_game(grid_display, screen_width, screen_height, box_width, box_height, game_grid, player_list)
+            game_status, rem_players = play_game(grid_display, screen_width, screen_height, box_width, box_height,
+                                                 game_grid, player_list)
         elif game_status == "Paused":
-            pause_game(grid_display, button_list, Color("White"), screen_width, screen_height, game_status)
-        elif game_status == "Dead":
-            pause_game(grid_display, button_list, Color("Red"), screen_width, screen_height, "Game Over")
+            pause_game(grid_display, button_list, Color("White"), screen_width, screen_height, game_status,
+                       rem_players)
+        elif game_status == "Game Over":
+            pause_game(grid_display, button_list, Color("Red"), screen_width, screen_height, game_status,
+                       rem_players)
 
         # the user can do things too, right? let's check those events
         for game_event in pygame.event.get():
@@ -67,13 +71,16 @@ def main():
                         if button.info == "Help":
                             game_status = "Help"
                         elif button.info == "1":
-                            player_list = create_player_list(1, game_grid)
+                            num_players = 1
+                            player_list = create_player_list(num_players, game_grid)
                             game_status = "Playing"
                         elif button.info == "2":
-                            player_list = create_player_list(2, game_grid)
+                            num_players = 2
+                            player_list = create_player_list(num_players, game_grid)
                             game_status = "Playing"
                         elif button.info == "3":
-                            player_list = create_player_list(3, game_grid)
+                            num_players = 3
+                            player_list = create_player_list(num_players, game_grid)
                             game_status = "Playing"
                         elif button.info == "Back":
                             game_status = "Menu"
@@ -82,23 +89,38 @@ def main():
                         elif button.info == "Continue":
                             game_status = "Playing"
                         elif button.info == "Reset":
-                            # TODO: Add methods to reset the state of the game
+                            game_grid, player_list = reset_game(num_players, grid_width, grid_height)
                             game_status = "Playing"
 
             # these key stroke events will only occur if the game is currently "Playing"
             elif game_event.type == KEYDOWN and game_status == "Playing":
-                if game_event.key == K_UP:
-                    # Player1.setDirection('up')
-                    pass
-                elif game_event.key == K_DOWN:
-                    # Player1.setDirection('down')
-                    pass
-                elif game_event.key == K_LEFT:
-                    # Player1.setDirection('left')
-                    pass
-                elif game_event.key == K_RIGHT:
-                    # Player1.setDirection('right')
-                    pass
+                if player_list[0].get_name() == "Player 1":
+                    if game_event.key == K_UP:
+                        player_list[0].set_direction("U")
+                    elif game_event.key == K_DOWN:
+                        player_list[0].set_direction("D")
+                    elif game_event.key == K_LEFT:
+                        player_list[0].set_direction("L")
+                    elif game_event.key == K_RIGHT:
+                        player_list[0].set_direction("R")
+                if player_list[1].get_name() == "Player 2":
+                    if game_event.key == K_w:
+                        player_list[1].set_direction("U")
+                    elif game_event.key == K_s:
+                        player_list[1].set_direction("D")
+                    elif game_event.key == K_a:
+                        player_list[1].set_direction("L")
+                    elif game_event.key == K_d:
+                        player_list[1].set_direction("R")
+                if player_list[2].get_name() == "Player 3":
+                    if game_event.key == K_i:
+                        player_list[2].set_direction("U")
+                    elif game_event.key == K_k:
+                        player_list[2].set_direction("D")
+                    elif game_event.key == K_j:
+                        player_list[2].set_direction("L")
+                    elif game_event.key == K_l:
+                        player_list[2].set_direction("R")
                 # pause the game with the "space" button
                 elif game_event.key == K_SPACE:
                     game_status = "Paused"
@@ -170,19 +192,19 @@ def create_player_list(num_players, game_grid):
         :param game_grid: 2D array representing the grid"""
 
     if num_players == 1:
-        return [Cycle("Player1", 2, 2, "R", Color("Blue")),
+        return [Cycle("Player 1", 2, 2, "R", Color("Blue")),
                 Cycle("AI", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
                 Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green")),
                 Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"))]
     elif num_players == 2:
-        return [Cycle("Player1", 2, 2, "R", Color("Blue")),
-                Cycle("Player2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
+        return [Cycle("Player 1", 2, 2, "R", Color("Blue")),
+                Cycle("Player 2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
                 Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green")),
                 Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"))]
     elif num_players == 3:
-        return [Cycle("Player1", 2, 2, "R", Color("Blue")),
-                Cycle("Player2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
-                Cycle("Player3", len(game_grid) - 3, 2, "D", Color("Green")),
+        return [Cycle("Player 1", 2, 2, "R", Color("Blue")),
+                Cycle("Player 2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
+                Cycle("Player 3", len(game_grid) - 3, 2, "D", Color("Green")),
                 Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"))]
 
 
@@ -203,10 +225,56 @@ def update_cycles(game_grid, player_list):
         :param player_list: list of game actors in the game"""
 
     for cycle in player_list:
-        game_grid = cycle.update_cycle(game_grid)
+        cycle.update_cycle(game_grid)
+
+
+def check_collisions(game_grid, player_list):
+    """checks all cycles to see if they have collided with another object
+        :param game_grid: grid of all game objects
+        :param player_list: list of game actors in the game"""
+
+    for cycle in player_list:
+        cycle.check_collision(game_grid)
+
+
+def check_death(player_list):
+    """checks whether all human players are dead
+        returns False if not all are dead
+        :param player_list: list of game actors in the game"""
+
+    count = 0
+    remaining_players = []
+
+    for cycle in player_list:
+        if not cycle.is_dead():
+            count += 1
+            remaining_players.append(cycle.get_name())
+
+    if count == 0:
+        return True, "None"
+    elif count == 1:
+        return True, remaining_players[0]
+
+    return False, remaining_players
 
 
 '''end game actor methods'''
+'''reset game'''
+
+
+def reset_game(num_players, grid_width, grid_height):
+    """resets all necessary items to completely reset the game
+        :param num_players: number of human players in this instance of the game
+        :param grid_width: number of columns in the grid
+        :param grid_height: number of rows in the grid"""
+
+    game_grid = gen_grid(grid_width, grid_height)
+    player_list = create_player_list(num_players, game_grid)
+
+    return game_grid, player_list
+
+
+'''end reset game'''
 '''play game methods'''
 
 
@@ -228,8 +296,15 @@ def play_game(grid_display, screen_width, screen_height, box_width, box_height, 
     # methods acting on the cycles
     draw_cycles(grid_display, box_width, box_height, player_list)
     update_cycles(game_grid, player_list)
+    check_collisions(game_grid, player_list)
+    all_dead, rem_players = check_death(player_list)
+
+    if all_dead:
+        return "Game Over", rem_players
 
     pygame.time.wait(100)
+
+    return "Playing", rem_players
 
 
 '''end play game methods'''
@@ -429,7 +504,7 @@ def create_help_text(player_name, control_list, start_x, start_y, grid_display, 
 '''pause menu methods'''
 
 
-def pause_game(grid_display, button_list, text_color, screen_width, screen_height, text):
+def pause_game(grid_display, button_list, text_color, screen_width, screen_height, text, rem_players):
     """creates the pause menu and all text, as well as activating the continue and reset button
         :param grid_display: the game display passed in as an arg
         :param button_list: list of all buttons present in the game
@@ -437,7 +512,8 @@ def pause_game(grid_display, button_list, text_color, screen_width, screen_heigh
         :param screen_width: the width of the screen
         :param screen_height: the height of the screen
         :param text: text to display at the top, either 'Game Over' or 'Paused'
-            this will also affect button display"""
+            this will also affect button display
+        :param rem_players: list of remaining players, or the winner in the case of game over screen"""
 
     # create a font for use in the menu
     pause_font = pygame.font.SysFont("monospace", 50)
@@ -447,7 +523,25 @@ def pause_game(grid_display, button_list, text_color, screen_width, screen_heigh
     center_text = pause_text.get_rect()
     center_text.centerx = screen_width * .5
     center_text.centery = screen_height * .25
-    grid_display.blit(pause_text, center_text)
+    grid_display.blit(pause_text, center_text.copy())
+
+    if text == "Paused":
+        # display remaining players
+        p_text = rem_players[0]
+
+        for player in rem_players[1:]:
+            p_text += ", " + player
+        players_text = pause_font.render(p_text, 1, text_color)
+        center_text = players_text.get_rect()
+        center_text.centerx = screen_width * .5
+        center_text.centery = screen_height * .3
+        grid_display.blit(players_text, center_text.copy())
+    else:
+        winner_text = pause_font.render("Winner: " + rem_players + "!", 1, Color("Green"))
+        center_text = winner_text.get_rect()
+        center_text.centerx = screen_width * .5
+        center_text.centery = screen_height * .3
+        grid_display.blit(winner_text, center_text.copy())
 
     # will not draw continue button if the game has already ended
     for button in button_list:
