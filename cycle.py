@@ -5,14 +5,15 @@ import pygame
 class Cycle(object):
     """an object representing a cycle in the game
     can be an AI or a player, represented by the name
-    takes initial x, y location, color, and direction as constructor variables
+    takes initial x, y location, color, head_color, and direction as constructor variables
     also sets the dead boolean variable to False"""
-    def __init__(self, name, pos_x, pos_y, direction, color):
+    def __init__(self, name, pos_x, pos_y, direction, color, head_color):
         self.name = name
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.direction = direction
         self.color = color
+        self.head_color = head_color
         self.dead = False
 
     def set_name(self, name):
@@ -34,7 +35,7 @@ class Cycle(object):
 
         if not self.dead:
             cycle_rect = (self.pos_x * box_width+1, self.pos_y * box_height+1, box_width - 1, box_height - 1)
-            pygame.draw.rect(display, self.color, cycle_rect)
+            pygame.draw.rect(display, self.head_color, cycle_rect)
 
     def update_cycle(self, grid):
         """updates the cycle if it is not dead based on its current position and the direction it is heading

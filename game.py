@@ -192,20 +192,20 @@ def create_player_list(num_players, game_grid):
         :param game_grid: 2D array representing the grid"""
 
     if num_players == 1:
-        return [Cycle("Player 1", 2, 2, "R", Color("Blue")),
-                Cycle("AI", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
-                Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green")),
-                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"))]
+        return [Cycle("Player 1", 2, 2, "R", Color("Blue"), Color("White")),
+                Cycle("AI", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red"), Color("White")),
+                Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green"), Color("White")),
+                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"), Color("White"))]
     elif num_players == 2:
-        return [Cycle("Player 1", 2, 2, "R", Color("Blue")),
-                Cycle("Player 2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
-                Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green")),
-                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"))]
+        return [Cycle("Player 1", 2, 2, "R", Color("Blue"), Color("White")),
+                Cycle("Player 2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red"), Color("White")),
+                Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green"), Color("White")),
+                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"), Color("White"))]
     elif num_players == 3:
-        return [Cycle("Player 1", 2, 2, "R", Color("Blue")),
-                Cycle("Player 2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red")),
-                Cycle("Player 3", len(game_grid) - 3, 2, "D", Color("Green")),
-                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"))]
+        return [Cycle("Player 1", 2, 2, "R", Color("Blue"), Color("White")),
+                Cycle("Player 2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red"), Color("White")),
+                Cycle("Player 3", len(game_grid) - 3, 2, "D", Color("Green"), Color("White")),
+                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"), Color("White"))]
 
 
 def draw_cycles(grid_display, box_width, box_height, player_list):
