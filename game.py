@@ -85,6 +85,7 @@ def main():
                         elif button.info == "Back":
                             game_status = "Menu"
                         elif button.info == "Menu":
+                            game_grid, player_list = reset_game(num_players, grid_width, grid_height)
                             game_status = "Menu"
                         elif button.info == "Continue":
                             game_status = "Playing"
