@@ -226,6 +226,8 @@ def update_cycles(game_grid, player_list):
         :param player_list: list of game actors in the game"""
 
     for cycle in player_list:
+        if cycle.get_name() == "AI":
+            update_AI()
         cycle.update_cycle(game_grid)
 
 
@@ -257,6 +259,10 @@ def check_death(player_list):
         return True, remaining_players[0]
 
     return False, remaining_players
+
+
+def update_AI():
+    pass
 
 
 '''end game actor methods'''
