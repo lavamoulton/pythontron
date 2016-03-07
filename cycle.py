@@ -1,5 +1,6 @@
 # imports
 import pygame
+import random
 
 
 class Cycle(object):
@@ -125,3 +126,17 @@ class Cycle(object):
             returns False otherwise"""
 
         return self.dead
+
+    def call_ai(self, game_grid):
+        """method to call AI for the non-human players in the game
+            :param game_grid: 2D array representation of the game grid"""
+
+        random_num = random.randint(1, 4)
+        if random_num == 1 and self.direction != "R":
+            self.set_direction("L")
+        elif random_num == 2 and self.direction != "L":
+            self.set_direction("R")
+        elif random_num == 3 and self.direction != "D":
+            self.set_direction("U")
+        elif random_num == 4 and self.direction != "U":
+            self.set_direction("D")
