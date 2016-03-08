@@ -99,7 +99,6 @@ class Cycle(object):
             :param grid: the game grid passed in containing all other game objects"""
 
         # TODO: handle cases where the other object is another cycle
-        # TODO: handle the wall surrounding the grid
 
         if self.pos_x != len(grid) - 1:
             grid[self.pos_x + 1][self.pos_y] = False
@@ -140,3 +139,15 @@ class Cycle(object):
             self.set_direction("U")
         elif random_num == 4 and self.direction != "U":
             self.set_direction("D")
+
+    def get_direction(self):
+        """returns the direction the cycle is currently heading
+            used for debugging purposes"""
+
+        return self.direction
+
+    def get_position(self):
+        """returns the x and y coordinates of this cycle
+            used for debugging purposes"""
+
+        return self.pos_x, self.pos_y
