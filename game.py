@@ -225,9 +225,20 @@ def update_cycles(game_grid, player_list):
         :param game_grid: grid of all game objects
         :param player_list: list of game actors in the game"""
 
+    count = 0
+
     for cycle in player_list:
-        update_bots(game_grid, player_list)
-        cycle.update_cycle(game_grid)
+        count += 1
+        if not cycle.is_dead():
+            update_bots(game_grid, cycle)
+            pos_x_1, pos_y_1 = cycle.get_position()
+            print count, cycle.get_name(), ":", pos_x_1, pos_y_1, cycle.get_direction()
+            cycle.update_cycle(game_grid)
+            pos_x_2, pos_y_2 = cycle.get_position()
+            print count, cycle.get_name(), ":", pos_x_2, "(", pos_x_2 - pos_x_1, ")", \
+                pos_y_2, "(", pos_y_2 - pos_y_1, ")", cycle.get_direction()
+
+    print
 
 
 def check_collisions(game_grid, player_list):
@@ -260,11 +271,12 @@ def check_death(player_list):
     return False, remaining_players
 
 
-def update_bots(game_grid, player_list):
+def update_bots(game_grid, cycle):
     """calls an AI method for bots present in the game
-        :param game_grid: 2D array represntation of the game grid
-        :param player_list: list of all game actors in the game"""
-    for cycle in player_list:
+        :param game_grid: 2D array representation of the game grid
+        :param cycle: AI cycle to perform the operation on"""
+
+    if not cycle.is_dead():
         if cycle.get_name() == "AI":
             cycle.call_ai(game_grid)
 
@@ -313,7 +325,7 @@ def play_game(grid_display, screen_width, screen_height, box_width, box_height, 
     if all_dead:
         return "Game Over", rem_players
 
-    pygame.time.wait(100)
+    pygame.time.wait(1000)
 
     return "Playing", rem_players
 
