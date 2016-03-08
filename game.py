@@ -143,6 +143,7 @@ def gen_grid(grid_width, grid_height):
     """creates a 2D array representing the grid
         :param grid_width: the number of squares in the grid's width
         :param grid_height: the number of squares in the grid's height"""
+
     grid = []
     for x in range(0, grid_width):
         grid.append([])
@@ -159,6 +160,7 @@ def draw_grid_lines(grid_display, screen_width, screen_height, box_width, box_he
         :param box_width: the screen_width divided by the number of boxes to have in the grid
         :param box_height: the screen_height divided by the number of boxes to have in the grid
         :param line_color: the color to make the grid lines"""
+
     for x in range(0, screen_width, box_width):
         for y in range(0, screen_height, box_height):
             pygame.draw.line(grid_display, line_color, (x, 0), (x, screen_height))
@@ -419,6 +421,7 @@ def get_image(folder_name, file_name):
         :returns final_image.get_rect(): the rectangle surrounding this image
         :param file_name: the name of the image in the given folder
         :param folder_name: the name of the folder to look in"""
+
     file_path = os.path.join(folder_name, file_name)
     try:
         final_image = pygame.image.load(file_path)
@@ -650,6 +653,7 @@ def create_buttons(grid_display, text_color, outline_color, screen_width, screen
 def reset_buttons(button_list):
     """sets all buttons to be non clickable
         :param button_list: list of all buttons present in the game"""
+
     for button in button_list:
         button.reset_click()
 
