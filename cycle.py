@@ -99,6 +99,7 @@ class Cycle(object):
             :param grid: the game grid passed in containing all other game objects"""
 
         # TODO: handle cases where the other object is another cycle
+        # TODO: case where something is driving against the wall, walls not disappearing as intended
 
         if self.pos_x != len(grid) - 1:
             grid[self.pos_x + 1][self.pos_y] = False
