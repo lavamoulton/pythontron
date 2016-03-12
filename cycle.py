@@ -152,3 +152,34 @@ class Cycle(object):
             used for debugging purposes"""
 
         return self.pos_x, self.pos_y
+
+    def set_position(self, pos_x, pos_y):
+        """sets the x and y coordinates of the cycle
+            :param pos_x: the x coordinate to shift to
+            :param pos_y: the y coordinate to shift to"""
+
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+
+    def set_color(self, color):
+        """sets the color of the cycle
+            :param color: the color to change to"""
+
+        self.color = color
+
+    def get_color(self):
+        """gets the color of the cycle"""
+
+        return self.color
+
+    def set_head_color(self, head_color):
+        """sets the head color of the cycle
+            :param head_color: the head color to change to"""
+
+        self.head_color = head_color
+
+    def get_head_color(self):
+        """gets the head color of the cycle"""
+
+        return self.head_color
+
