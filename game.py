@@ -227,20 +227,20 @@ def update_cycles(game_grid, player_list):
         :param game_grid: grid of all game objects
         :param player_list: list of game actors in the game"""
 
-    count = 0
+    # count = 0
 
     for cycle in player_list:
-        count += 1
+        # count += 1
         if not cycle.is_dead():
             update_bots(game_grid, cycle)
-            pos_x_1, pos_y_1 = cycle.get_position()
-            print count, cycle.get_name(), ":", pos_x_1, pos_y_1, cycle.get_direction()
+            # pos_x_1, pos_y_1 = cycle.get_position()
+            # print count, cycle.get_name(), ":", pos_x_1, pos_y_1, cycle.get_direction()
             cycle.update_cycle(game_grid)
-            pos_x_2, pos_y_2 = cycle.get_position()
-            print count, cycle.get_name(), ":", pos_x_2, "(", pos_x_2 - pos_x_1, ")", \
-                pos_y_2, "(", pos_y_2 - pos_y_1, ")", cycle.get_direction()
+            # pos_x_2, pos_y_2 = cycle.get_position()
+            # print count, cycle.get_name(), ":", pos_x_2, "(", pos_x_2 - pos_x_1, ")", \
+            #    pos_y_2, "(", pos_y_2 - pos_y_1, ")", cycle.get_direction()
 
-    print
+    #print
 
 
 def check_collisions(game_grid, player_list):
