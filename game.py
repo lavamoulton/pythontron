@@ -227,20 +227,10 @@ def update_cycles(game_grid, player_list):
         :param game_grid: grid of all game objects
         :param player_list: list of game actors in the game"""
 
-    # count = 0
-
     for cycle in player_list:
-        # count += 1
         if not cycle.is_dead():
             update_bots(game_grid, cycle)
-            # pos_x_1, pos_y_1 = cycle.get_position()
-            # print count, cycle.get_name(), ":", pos_x_1, pos_y_1, cycle.get_direction()
             cycle.update_cycle(game_grid)
-            # pos_x_2, pos_y_2 = cycle.get_position()
-            # print count, cycle.get_name(), ":", pos_x_2, "(", pos_x_2 - pos_x_1, ")", \
-            #    pos_y_2, "(", pos_y_2 - pos_y_1, ")", cycle.get_direction()
-
-    #print
 
 
 def check_collisions(game_grid, player_list):
@@ -266,8 +256,10 @@ def check_death(player_list):
             remaining_players.append(cycle.get_name())
 
     if count == 0:
+        pygame.time.wait(1000)
         return True, "None"
     elif count == 1:
+        pygame.time.wait(1000)
         return True, remaining_players[0]
 
     return False, remaining_players
@@ -327,7 +319,9 @@ def play_game(grid_display, screen_width, screen_height, box_width, box_height, 
     if all_dead:
         return "Game Over", rem_players
 
-    pygame.time.wait(1000)
+    # only activate this for debugging purposes
+    # pygame.time.wait(1000)
+    pygame.time.wait(100)
 
     return "Playing", rem_players
 
@@ -660,4 +654,5 @@ def reset_buttons(button_list):
 
 '''end buttons buttons buttons'''
 '''You've reached the end of the file?'''
+
 main()

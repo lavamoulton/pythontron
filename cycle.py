@@ -183,3 +183,4 @@ class Cycle(object):
 
         return self.head_color
 
+
