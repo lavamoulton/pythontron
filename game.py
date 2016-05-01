@@ -31,7 +31,7 @@ def main():
     player_list = []  # list of players in the game, will change based on number of human players
 
     # misc
-    pygame.display.set_caption("PyTron!")
+    pygame.display.set_caption("Snake Pit")
 
     # it's time to loop!
     while True:
@@ -195,20 +195,20 @@ def create_player_list(num_players, game_grid):
         :param game_grid: 2D array representing the grid"""
 
     if num_players == 1:
-        return [Cycle("Player 1", 2, 2, "R", Color("Blue"), Color("White")),
-                Cycle("AI", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red"), Color("White")),
-                Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green"), Color("White")),
-                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"), Color("White"))]
+        return [Cycle("Player 1", 3, 3, "R", Color("Blue"), Color("White")),
+                Cycle("AI", len(game_grid) - 4, len(game_grid[0]) - 4, "L", Color("Red"), Color("White")),
+                Cycle("AI", len(game_grid) - 4, 3, "D", Color("Green"), Color("White")),
+                Cycle("AI", 3, len(game_grid) - 4, "U", Color("Yellow"), Color("White"))]
     elif num_players == 2:
-        return [Cycle("Player 1", 2, 2, "R", Color("Blue"), Color("White")),
-                Cycle("Player 2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red"), Color("White")),
-                Cycle("AI", len(game_grid) - 3, 2, "D", Color("Green"), Color("White")),
-                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"), Color("White"))]
+        return [Cycle("Player 1", 3, 3, "R", Color("Blue"), Color("White")),
+                Cycle("Player 2", len(game_grid) - 4, len(game_grid[0]) - 4, "L", Color("Red"), Color("White")),
+                Cycle("AI", len(game_grid) - 4, 3, "D", Color("Green"), Color("White")),
+                Cycle("AI", 3, len(game_grid) - 4, "U", Color("Yellow"), Color("White"))]
     elif num_players == 3:
-        return [Cycle("Player 1", 2, 2, "R", Color("Blue"), Color("White")),
-                Cycle("Player 2", len(game_grid) - 3, len(game_grid[0]) - 3, "L", Color("Red"), Color("White")),
-                Cycle("Player 3", len(game_grid) - 3, 2, "D", Color("Green"), Color("White")),
-                Cycle("AI", 2, len(game_grid) - 3, "U", Color("Yellow"), Color("White"))]
+        return [Cycle("Player 1", 3, 3, "R", Color("Blue"), Color("White")),
+                Cycle("Player 2", len(game_grid) - 4, len(game_grid[0]) - 4, "L", Color("Red"), Color("White")),
+                Cycle("Player 3", len(game_grid) - 4, 3, "D", Color("Green"), Color("White")),
+                Cycle("AI", 3, len(game_grid) - 4, "U", Color("Yellow"), Color("White"))]
 
 
 def draw_cycles(grid_display, box_width, box_height, player_list):
@@ -239,7 +239,7 @@ def check_collisions(game_grid, player_list):
         :param player_list: list of game actors in the game"""
 
     for cycle in player_list:
-        cycle.check_collision(game_grid)
+        cycle.check_collision(game_grid, player_list)
 
 
 def check_death(player_list):
@@ -362,7 +362,7 @@ def draw_menu_text(grid_display, text_color, screen_width, screen_height):
     # create title font
     title_font = pygame.font.SysFont("monospace", screen_width / 15)
 
-    menu_font = title_font.render("PyTron!", 1, text_color)
+    menu_font = title_font.render("Snake Pit", 1, text_color)
     center_text = menu_font.get_rect()
     center_text.centerx = grid_display.get_rect().centerx
     grid_display.blit(menu_font, center_text)

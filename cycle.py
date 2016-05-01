@@ -68,9 +68,17 @@ class Cycle(object):
         elif direction == "L" and self.direction != "R":
             self.direction = direction
 
-    def check_collision(self, grid):
+    def check_collision(self, grid, player_list):
         """checks if the cycle has collided with another object
-            :param grid: the game grid passed in containing all other game objects"""
+            :param grid: the game grid passed in containing all other game objects
+            :param player_list: a list of all active players in the game"""
+
+        for player in player_list:
+            if player.get_color() != self.get_color():
+                temp_position = player.get_position()
+                if self.pos_x == temp_position[0] and self.pos_y == temp_position[1]:
+                    self.kill_cycle(grid)
+                    player.kill_cycle(grid)
 
         if self.pos_x < 1 or self.pos_x > len(grid) - 2:
             self.kill_cycle(grid)
@@ -131,15 +139,58 @@ class Cycle(object):
         """method to call AI for the non-human players in the game
             :param game_grid: 2D array representation of the game grid"""
 
-        random_num = random.randint(1, 4)
-        if random_num == 1 and self.direction != "R":
-            self.set_direction("L")
-        elif random_num == 2 and self.direction != "L":
-            self.set_direction("R")
-        elif random_num == 3 and self.direction != "D":
-            self.set_direction("U")
-        elif random_num == 4 and self.direction != "U":
-            self.set_direction("D")
+        dir_list = ["L","R","U","D"]
+        directions = self.check_adj(game_grid)
+        """turn_flag = random.randint(1, 5)
+        if turn_flag == 1:
+            random_num = random.randint(1, 4)
+            if random_num == 1 and self.direction != "R":
+                self.set_direction("L")
+            elif random_num == 2 and self.direction != "L":
+                self.set_direction("R")
+            elif random_num == 3 and self.direction != "D":
+                self.set_direction("U")
+            elif random_num == 4 and self.direction != "U":
+                self.set_direction("D")"""
+
+        if self.direction in directions:
+            for direction in directions:
+                dir_list.remove(direction)
+            if self.direction in dir_list:
+                dir_list.remove(self.direction)
+            if len(dir_list) > 0:
+                random_num = random.randint(1, len(dir_list))
+                self.set_direction(dir_list[random_num-1])
+
+
+    def check_adj(self, game_grid):
+        """method that checks immediate surroundings of cycle to determine what direction to turn
+            :param game_grid: 2D array representation of the game grid
+            :return directions of adjacent walls"""
+
+        directions = []
+        if game_grid[self.pos_x+1][self.pos_y]:
+            directions.append("R")
+        if game_grid[self.pos_x-1][self.pos_y]:
+            directions.append("L")
+        if game_grid[self.pos_x][self.pos_y+1]:
+            directions.append("D")
+        if game_grid[self.pos_x][self.pos_y-1]:
+            directions.append("U")
+        if self.pos_x < 2:
+            if "L" not in directions:
+                directions.append("L")
+        if self.pos_x > len(game_grid) - 3:
+            if "R" not in directions:
+                directions.append("R")
+        if self.pos_y < 2:
+            if "U" not in directions:
+                directions.append("U")
+        if self.pos_y > len(game_grid[0]) - 3:
+            if "D" not in directions:
+                directions.append("D")
+
+        return directions
 
     def get_direction(self):
         """returns the direction the cycle is currently heading
