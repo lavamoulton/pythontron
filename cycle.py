@@ -1,6 +1,8 @@
 # imports
 import pygame
 import random
+import time
+from copy import deepcopy
 
 
 class Cycle(object):
@@ -53,6 +55,26 @@ class Cycle(object):
                 self.pos_y -= 1
             elif self.direction == "D":
                 self.pos_y += 1
+
+    def alt_update(self, grid, direction):
+        if direction == "R":
+            self.pos_x += 1
+        elif direction == "L":
+            self.pos_x -= 1
+        elif direction == "U":
+            self.pos_y -= 1
+        elif direction == "D":
+            self.pos_y += 1
+
+    def backtrack_cycle(self, grid, direction):
+        if direction == "R":
+            self.pos_x -= 1
+        elif direction == "L":
+            self.pos_x += 1
+        elif direction == "U":
+            self.pos_y += 1
+        elif direction == "D":
+            self.pos_y -= 1
 
     def set_direction(self, direction):
         """sets the direction the cycle is heading
@@ -135,33 +157,8 @@ class Cycle(object):
 
         return self.dead
 
-    def call_ai(self, game_grid):
-        """method to call AI for the non-human players in the game
-            :param game_grid: 2D array representation of the game grid"""
-
-        dir_list = ["L","R","U","D"]
-        directions = self.check_adj(game_grid)
-        """turn_flag = random.randint(1, 5)
-        if turn_flag == 1:
-            random_num = random.randint(1, 4)
-            if random_num == 1 and self.direction != "R":
-                self.set_direction("L")
-            elif random_num == 2 and self.direction != "L":
-                self.set_direction("R")
-            elif random_num == 3 and self.direction != "D":
-                self.set_direction("U")
-            elif random_num == 4 and self.direction != "U":
-                self.set_direction("D")"""
-
-        if self.direction in directions:
-            for direction in directions:
-                dir_list.remove(direction)
-            if self.direction in dir_list:
-                dir_list.remove(self.direction)
-            if len(dir_list) > 0:
-                random_num = random.randint(1, len(dir_list))
-                self.set_direction(dir_list[random_num-1])
-
+    def get_adjacent(self, DIRECTIONS):
+        return [self.head(direction, self.get_position()) for direction in DIRECTIONS]
 
     def check_adj(self, game_grid):
         """method that checks immediate surroundings of cycle to determine what direction to turn
@@ -191,6 +188,25 @@ class Cycle(object):
                 directions.append("D")
 
         return directions
+
+    def head(self, direction, position=None):
+        """get tile in front of the cycle
+            :param direction: direction the cycle is heading in scenario
+            :param position: current position of the cycle in scenario"""
+
+        if not position:
+            position = self.get_position()
+        x, y = position
+        if direction == "U":
+            return x, y-1
+        elif direction == "D":
+            return x, y+1
+        elif direction == "R":
+            return x+1, y
+        elif direction == "L":
+            return x-1, y
+        else:
+            raise KeyError("Not a valid direction: %s" % direction)
 
     def get_direction(self):
         """returns the direction the cycle is currently heading

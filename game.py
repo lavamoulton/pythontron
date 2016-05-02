@@ -4,6 +4,20 @@ from cycle import *
 from pygame import *
 import sys
 import os
+import time
+
+SEPARATED = False
+START_TIME = None
+INFINITY = 2**31
+DIRECTIONS = ("U", "D", "R", "L")
+MIRROR = {"U":"D", "D":"U", "R":"L", "L":"R"}
+GRID_WIDTH = 24
+GRID_HEIGHT = 24
+
+
+class Elapsed(Exception):
+    # print("time > 1.00 second")
+    pass
 
 
 def main():
@@ -11,11 +25,11 @@ def main():
 
     # this game has got to start somewhere, let's initialize some things
     pygame.init()
-    game_clock = 30
+    game_clock = 60
     screen_width = 1024
     screen_height = 1024
-    grid_width = 64
-    grid_height = 64
+    grid_width = GRID_WIDTH
+    grid_height = GRID_HEIGHT
     box_width = screen_width / grid_width
     box_height = screen_height / grid_height
 
@@ -113,7 +127,7 @@ def main():
                         player_list[1].set_direction("L")
                     elif game_event.key == K_d:
                         player_list[1].set_direction("R")
-                if player_list[2].get_name() == "Player 3":
+                '''if player_list[2].get_name() == "Player 3":
                     if game_event.key == K_i:
                         player_list[2].set_direction("U")
                     elif game_event.key == K_k:
@@ -121,12 +135,12 @@ def main():
                     elif game_event.key == K_j:
                         player_list[2].set_direction("L")
                     elif game_event.key == K_l:
-                        player_list[2].set_direction("R")
+                        player_list[2].set_direction("R")'''
                 # pause the game with the "space" button
-                elif game_event.key == K_SPACE:
+                if game_event.key == K_SPACE:
                     game_status = "Paused"
                 # go back to main menu with the "escape" button
-                elif game_event.key == K_ESCAPE:
+                if game_event.key == K_ESCAPE:
                     game_status = "Menu"
 
         # draw current state of screen
@@ -195,10 +209,8 @@ def create_player_list(num_players, game_grid):
         :param game_grid: 2D array representing the grid"""
 
     if num_players == 1:
-        return [Cycle("Player 1", 3, 3, "R", Color("Blue"), Color("White")),
-                Cycle("AI", len(game_grid) - 4, len(game_grid[0]) - 4, "L", Color("Red"), Color("White")),
-                Cycle("AI", len(game_grid) - 4, 3, "D", Color("Green"), Color("White")),
-                Cycle("AI", 3, len(game_grid) - 4, "U", Color("Yellow"), Color("White"))]
+        return [Cycle("Player 1", 1, 1, "R", Color("Blue"), Color("White")),
+                Cycle("AI", len(game_grid) - 2, len(game_grid[0]) - 2, "L", Color("Red"), Color("White"))]
     elif num_players == 2:
         return [Cycle("Player 1", 3, 3, "R", Color("Blue"), Color("White")),
                 Cycle("Player 2", len(game_grid) - 4, len(game_grid[0]) - 4, "L", Color("Red"), Color("White")),
@@ -229,7 +241,7 @@ def update_cycles(game_grid, player_list):
 
     for cycle in player_list:
         if not cycle.is_dead():
-            update_bots(game_grid, cycle)
+            update_bots(game_grid, cycle, player_list)
             cycle.update_cycle(game_grid)
 
 
@@ -265,14 +277,316 @@ def check_death(player_list):
     return False, remaining_players
 
 
-def update_bots(game_grid, cycle):
+def update_bots(game_grid, cycle, player_list):
     """calls an AI method for bots present in the game
         :param game_grid: 2D array representation of the game grid
         :param cycle: AI cycle to perform the operation on"""
 
     if not cycle.is_dead():
         if cycle.get_name() == "AI":
-            cycle.call_ai(game_grid)
+            direction = next_move(game_grid, player_list)
+            cycle.set_direction(direction)
+
+
+def next_move(game_grid, player_list):
+    """determines the next best move the AI should take
+        :param game_grid: A 2D array representation of the grid"""
+
+    grid = deepcopy(game_grid)
+    p_list = deepcopy(player_list)
+    global START_TIME
+    START_TIME = time.time()
+    move = None
+    depth = 1
+    try:
+        # checks if the players are separated
+        if not SEPARATED:
+            while True:
+                alpha, move = alpha_beta(grid, depth, -INFINITY, +INFINITY, 1, p_list)
+                depth += 1
+        else:
+            pass
+    except Elapsed:
+        # print("Hello I'm here!")
+        if move is not None:
+            return move
+        else:
+            return "U"
+
+
+def alpha_beta(node, depth, alpha, beta, player_num, player_list, best_first_move=None):
+    """variation of minimax algorithm to determine the best possible move for the AI
+        :param node: the current node as it recursively iterates
+        :param depth: the current depth
+        :param alpha: used in pruning
+        :param beta: used in pruning
+        :param player_num: 1 for bot, -1 for human
+        :param best_first_move: optionally provided"""
+
+    if player_num == 1:
+        player = player_list[player_num]
+        opp_player = player_list[0]
+    else:
+        player = player_list[0]
+        opp_player = player_list[1]
+
+    # get list of potential moves
+    moves = list(pos_moves(node, player_num, player_list))
+
+    # no possible moves
+    if depth == 0 or len(moves) == 0:
+        alpha = evaluate(node, player_num, player_list)
+        return alpha, None
+
+    order_by_closeness(node, (len(node)/2, len(node[0])), moves, player_num, player_list)
+    order_by_closeness(node, opp_player.get_position(), moves, player_num, player_list)
+
+    if best_first_move is not None:
+        moves.remove(best_first_move)
+        moves = [best_first_move] + moves
+
+    best_move = moves[0] if len(moves) > 0 else None
+
+    for move in moves:
+        # print(check_elapsed_time())
+        '''if check_elapsed_time() > 0.98:
+            return 0, None'''
+        check_elapsed_time()
+
+        move_forth(node, move, player_num, player_list)
+        val = -alpha_beta(node, depth-1, -beta, -alpha, -player_num, player_list)[0]
+        move_back(node, move, player_num, player_list)
+
+        if val > alpha:
+            best_move = move
+            alpha = val
+            if alpha >= beta:
+                return alpha, best_move
+
+    '''val = -11*player_num
+    if val > alpha:
+        for d in DIRECTIONS:
+            if node[player.head(d, player.get_position())] == '''
+
+    return alpha, best_move
+
+
+def move_back(node, move, player_num, player_list):
+    if player_num == 1:
+        player = player_list[player_num]
+        opp_player = player_list[0]
+    else:
+        player = player_list[0]
+        opp_player = player_list[1]
+
+    position = player.get_position()
+    x = position[0]
+    y = position[1]
+    to = player.head(MIRROR[move], position)
+    node[x][y] = False
+
+    player.backtrack_cycle(node, move)
+
+
+def move_forth(node, move, player_num, player_list):
+    if player_num == 1:
+        player = player_list[player_num]
+        opp_player = player_list[0]
+    else:
+        player = player_list[0]
+        opp_player = player_list[1]
+
+    position = player.get_position()
+    x = position[0]
+    y = position[1]
+    to = player.head(move, position)
+    node[x][y] = player.get_color()
+
+    player.alt_update(node, move)
+
+
+def check_elapsed_time():
+    # print(START_TIME)
+    t = time.time()
+    # print(t-START_TIME)
+    if (t-START_TIME) > 0.48:
+        # print("TIME!")
+        raise Elapsed()
+
+
+def order_by_closeness(node, to, moves, player_num, player_list):
+    if player_num == 1:
+        player = player_list[player_num]
+        opp_player = player_list[0]
+    else:
+        player = player_list[0]
+        opp_player = player_list[1]
+
+    x, y = player.get_position()
+    ox, oy = to
+    dy = y-oy
+    dx = x-ox
+
+    def order(a,b):
+        if dy > 0:
+            if a == "D" : return 1
+            if b == "D" : return -1
+            if a == "U" : return -1
+            if b == "U" : return 1
+        if dy < 0:
+            if a == "D" : return -1
+            if b == "D" : return 1
+            if a == "U" : return 1
+            if a == "U" : return -1
+        if dx > 0:
+            if a == "R" : return 1
+            if b == "R" : return -1
+            if a == "L" : return -1
+            if b == "L" : return 1
+        if dx < 0:
+            '''possible source of error'''
+            if a == "R" : return 1
+            if b == "R" : return -1
+            if a == "L" : return -1
+            if a == "L" : return 1
+        return 0
+
+    moves.sort(order)
+
+
+def evaluate(node, player_num, player_list):
+    if player_num == 1:
+        player = player_list[player_num]
+        opp_player = player_list[0]
+    else:
+        player = player_list[0]
+        opp_player = player_list[1]
+    bot_moves = len(pos_moves(node, 1, player_list))
+    player_moves = len(pos_moves(node, -1, player_list))
+    players_adjacent = opp_player.get_position() in opp_player.get_adjacent(DIRECTIONS)
+
+    if bot_moves == 0 or player_moves == 0:
+        if bot_moves > 0:
+            if players_adjacent:
+                result = -11
+            else:
+                result = 100
+        elif player_moves > 0:
+            if players_adjacent:
+                result = -11
+            else:
+                result = -100
+        else:
+            result = -11
+    else:
+        if not are_connected(node, player.get_position(), opp_player.get_position()):
+            p_moves = fill_from(node, player.get_position())
+            opp_moves = fill_from(node, opp_player.get_position())
+            m = len(p_moves)
+            t = len(opp_moves)
+            result = 12+float(abs(m-t))/float(max(m,t))*86
+            if t > m:
+                result = -result
+        else:
+            result = 0
+
+    return result*player_num
+
+
+def fill_from(node, position, maxi=200):
+    old = set()
+    new = set()
+    new.add(position)
+    while len(new)>0 and len(old) < maxi:
+        t = new.pop()
+        old.add(t)
+        temp = Cycle("temp", t[0], t[1], "U", Color("Blue"), Color("Blue"))
+        for a in temp.get_adjacent(DIRECTIONS):
+            if not passable(a, node) or a in old:
+                continue
+            else:
+                new.add(a)
+    return old
+
+
+def dist (start, end):
+    a, b = start
+    c, d = end
+    return (abs(a-c)+abs(b-d))
+
+
+def are_connected(node, start, end):
+    closedset = set()
+    openset = [start]
+    g_score = {start : 0}
+    h_score = {start : dist(start, end)}
+    f_score = {start : h_score[start]}
+
+    def lowestf(x, y):
+        if f_score[x] > f_score[y]:
+            return -1
+        elif f_score[x] == f_score[y]:
+            return 0
+        else:
+            return 1
+
+    def neighbor_nodes(node, x):
+        temp = Cycle("temp", x[0], x[1], "U", Color("Blue"), Color("Blue"))
+        for i in temp.get_adjacent(DIRECTIONS):
+            x_pos = i[0]
+            y_pos = i[1]
+            if x_pos < GRID_WIDTH-1 and y_pos < GRID_HEIGHT-1 and x_pos > 0 and y_pos > 0:
+            # print(x_pos, y_pos)
+                if not node[x_pos][y_pos]:
+                    yield i
+
+    while len(openset) > 0:
+        openset.sort(lowestf)
+        x = openset.pop()
+        if x == end:
+            return True
+        closedset.add(x)
+        for y in neighbor_nodes(node, x):
+            if y in closedset:
+                continue
+            tentative_g_score = g_score[x] + 1
+            if y not in openset:
+                openset.append(y)
+                tentative_is_better = True
+            elif tentative_g_score < g_score[y]:
+                tentative_is_better = True
+            else:
+                tentative_is_better = False
+
+            if tentative_is_better:
+                g_score[y] = tentative_g_score
+                h_score[y] = dist(y, end)
+                f_score[y] = g_score[y] + h_score[y]
+
+    return False
+
+
+def pos_moves(node, player_num, player_list):
+    """Find potential next moves, eliminating unreasonable ones
+        :param node: the current node
+        :param player_num: AI or human?"""
+
+    if player_num == 1:
+        player = player_list[player_num]
+    else:
+        player = player_list[0]
+    position = player.get_position()
+    possible = dict((direction, player.head(direction,position)) for direction in DIRECTIONS)
+    pass_moves = [direction for direction in possible if passable(possible[direction], node)]
+    return pass_moves
+
+
+def passable(coords, grid):
+    x, y = coords
+    if x < GRID_WIDTH-1 and y < GRID_HEIGHT-1 and x > 0 and y > 0:
+        return not grid[x][y]
+    else:
+        return False
 
 
 '''end game actor methods'''
@@ -321,7 +635,7 @@ def play_game(grid_display, screen_width, screen_height, box_width, box_height, 
 
     # only activate this for debugging purposes
     # pygame.time.wait(1000)
-    pygame.time.wait(100)
+    # pygame.time.wait(10)
 
     return "Playing", rem_players
 
