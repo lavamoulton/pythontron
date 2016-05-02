@@ -11,8 +11,8 @@ START_TIME = None
 INFINITY = 2**31
 DIRECTIONS = ("U", "D", "R", "L")
 MIRROR = {"U":"D", "D":"U", "R":"L", "L":"R"}
-GRID_WIDTH = 24
-GRID_HEIGHT = 24
+GRID_WIDTH = 32
+GRID_HEIGHT = 32
 
 
 class Elapsed(Exception):
@@ -25,7 +25,7 @@ def main():
 
     # this game has got to start somewhere, let's initialize some things
     pygame.init()
-    game_clock = 60
+    game_clock = 30
     screen_width = 1024
     screen_height = 1024
     grid_width = GRID_WIDTH
@@ -213,14 +213,12 @@ def create_player_list(num_players, game_grid):
                 Cycle("AI", len(game_grid) - 2, len(game_grid[0]) - 2, "L", Color("Red"), Color("White"))]
     elif num_players == 2:
         return [Cycle("Player 1", 3, 3, "R", Color("Blue"), Color("White")),
-                Cycle("Player 2", len(game_grid) - 4, len(game_grid[0]) - 4, "L", Color("Red"), Color("White")),
-                Cycle("AI", len(game_grid) - 4, 3, "D", Color("Green"), Color("White")),
-                Cycle("AI", 3, len(game_grid) - 4, "U", Color("Yellow"), Color("White"))]
-    elif num_players == 3:
+                Cycle("Player 2", len(game_grid) - 4, len(game_grid[0]) - 4, "L", Color("Red"), Color("White"))]
+    '''elif num_players == 3:
         return [Cycle("Player 1", 3, 3, "R", Color("Blue"), Color("White")),
                 Cycle("Player 2", len(game_grid) - 4, len(game_grid[0]) - 4, "L", Color("Red"), Color("White")),
                 Cycle("Player 3", len(game_grid) - 4, 3, "D", Color("Green"), Color("White")),
-                Cycle("AI", 3, len(game_grid) - 4, "U", Color("Yellow"), Color("White"))]
+                Cycle("AI", 3, len(game_grid) - 4, "U", Color("Yellow"), Color("White"))]'''
 
 
 def draw_cycles(grid_display, box_width, box_height, player_list):
@@ -409,7 +407,7 @@ def check_elapsed_time():
     # print(START_TIME)
     t = time.time()
     # print(t-START_TIME)
-    if (t-START_TIME) > 0.48:
+    if (t-START_TIME) > 0.18:
         # print("TIME!")
         raise Elapsed()
 
@@ -635,7 +633,8 @@ def play_game(grid_display, screen_width, screen_height, box_width, box_height, 
 
     # only activate this for debugging purposes
     # pygame.time.wait(1000)
-    # pygame.time.wait(10)
+    if player_list[1].get_name() != "AI":
+        pygame.time.wait(100)
 
     return "Playing", rem_players
 
@@ -756,26 +755,26 @@ def display_help(grid_display, button_list, text_color, screen_width, screen_hei
     # All text for player 1
     player_1_controls = ["Left Arrow Key", "Right Arrow Key", "Up Arrow Key",
                          "Down Arrow Key"]
-    create_help_text("Player 1", player_1_controls, screen_width * .15,
+    create_help_text("Player 1", player_1_controls, screen_width * .2,
                      screen_height * .1, grid_display, text_color, screen_width, screen_height)
 
     # All text for player 2
     player_2_controls = ["A", "D", "W", "S"]
-    create_help_text("Player 2", player_2_controls, screen_width * .5,
+    create_help_text("Player 2", player_2_controls, screen_width * .8,
                      screen_height * .1, grid_display, text_color, screen_width, screen_height)
 
     # draws dividing line between the first and second set of instructions
-    pygame.draw.line(grid_display, text_color, (screen_width * .35, screen_height * .08),
-                     (screen_width * .35, screen_height * .6))
+    pygame.draw.line(grid_display, text_color, (screen_width * .5, screen_height * .08),
+                     (screen_width * .5, screen_height * .6))
 
-    # All text for player 3
+    '''# All text for player 3
     player_3_controls = ["J", "L", "I", "K"]
     create_help_text("Player 3", player_3_controls, screen_width * .85,
-                     screen_height * .1, grid_display, text_color, screen_width, screen_height)
+                     screen_height * .1, grid_display, text_color, screen_width, screen_height)'''
 
-    # draws divide line between the 2nd and 3rd set of instructions
+    '''# draws divide line between the 2nd and 3rd set of instructions
     pygame.draw.line(grid_display, text_color, (screen_width * .66, screen_height * .08),
-                     (screen_width * .66, screen_height * .6))
+                     (screen_width * .66, screen_height * .6))'''
 
     # makes the back button visible
     for button in button_list:
@@ -921,14 +920,14 @@ def create_buttons(grid_display, text_color, outline_color, screen_width, screen
     all_button.append(one_button)
 
     # 2 player button
-    center_text.left = screen_width * .44
+    center_text.left = screen_width * .60
     two_button = Button(center_text.copy(), "2", text_color, outline_color, button_font)
     all_button.append(two_button)
 
-    # 3 player button
+    '''# 3 player button
     center_text.left = screen_width * .6
     three_button = Button(center_text.copy(), "3", text_color, outline_color, button_font)
-    all_button.append(three_button)
+    all_button.append(three_button)'''
 
     # back button
     center_text.width = screen_width * .25
